@@ -35,3 +35,10 @@ func dissolve():
 	var tween = create_tween()
 	tween.tween_property($MeshInstance3D, "transparency", 1.0, 3.0)
 	tween.tween_callback(func(): queue_free())
+func _ready():
+	$Camera3D.top_level = true
+
+func _process(delta):
+	var target_pos = global_position + Vector3(0, 4, 7)
+	$Camera3D.global_position = $Camera3D.global_position.lerp(target_pos, 0.1)
+	$Camera3D.look_at(global_position + Vector3(0, 1, 0), Vector3.UP)

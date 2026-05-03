@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://rlisg4twlwnn" path="res://tree.gd" id="3_cw7a8"]
 [ext_resource type="Script" uid="uid://dbd78lby23qlu" path="res://decision.gd" id="4_qpfqq"]
 [ext_resource type="Script" uid="uid://4vwtrw02wfsm" path="res://fox.gd" id="5_xx6p7"]
+[ext_resource type="AudioStream" uid="uid://ipuis3ss7y7p" path="res://170515__rolandasb__forest_ambient_01_loop.wav" id="6_xvbrs"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q7od0"]
 
@@ -115,6 +116,10 @@ script = ExtResource("5_xx6p7")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Fox" unique_id=75569591]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4)
 mesh = SubResource("BoxMesh_qpfqq")
+
+[node name="AmbientSound" type="AudioStreamPlayer" parent="." unique_id=1862584676]
+stream = ExtResource("6_xvbrs")
+autoplay = true
 
 [connection signal="body_entered" from="Plant/InteractZone" to="Plant" method="_on_interact_zone_body_entered"]
 [connection signal="body_exited" from="Plant/InteractZone" to="Plant" method="_on_interact_zone_body_exited"]

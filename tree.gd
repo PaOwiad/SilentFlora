@@ -16,3 +16,4 @@ func _on_interact_zone_body_entered(body: Node3D) -> void:
 func _on_interact_zone_body_exited(body: Node3D) -> void:
 	if body.name == "Player":
 		body.near_tree = false
+  

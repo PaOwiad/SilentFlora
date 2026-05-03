@@ -31,5 +31,4 @@ func apply_world_change():
 	else:
 		print("Welt wird grauer")
 		env.environment.adjustment_saturation = 0.3
-	await get_tree().create_timer(5.0).timeout
-	get_node("../Player").dissolve()
+	
