@@ -10,23 +10,46 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xmjwg"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_q7od0"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xx6p7"]
+albedo_color = Color(0.11764706, 0.23529412, 0.11764706, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_n7s7b"]
+material = SubResource("StandardMaterial3D_xx6p7")
+size = Vector2(50, 50)
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_xmjwg"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xvbrs"]
+albedo_color = Color(0.15686275, 0.47058824, 0.15686275, 1)
+
 [sub_resource type="SphereMesh" id="SphereMesh_xmjwg"]
+material = SubResource("StandardMaterial3D_xvbrs")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ddv0k"]
 radius = 2.0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n7s7b"]
+albedo_color = Color(0.3137255, 0.19607843, 0.11764706, 1)
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_ddv0k"]
+material = SubResource("StandardMaterial3D_n7s7b")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_xx6p7"]
 
-[sub_resource type="Environment" id="Environment_qpfqq"]
-adjustment_enabled = true
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_xx6p7"]
+
+[sub_resource type="Sky" id="Sky_n7s7b"]
+sky_material = SubResource("ProceduralSkyMaterial_xx6p7")
+
+[sub_resource type="Environment" id="Environment_xvbrs"]
+background_mode = 2
+sky = SubResource("Sky_n7s7b")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_st2r7"]
+albedo_color = Color(0.7058824, 0.39215687, 0.11764706, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_qpfqq"]
+material = SubResource("StandardMaterial3D_st2r7")
 
 [node name="FlüsterhainScene" type="Node3D" unique_id=627585724]
 
@@ -46,7 +69,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
 [node name="Boden" type="StaticBody3D" parent="." unique_id=1331204617]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Boden" unique_id=475825714]
-mesh = SubResource("PlaneMesh_q7od0")
+mesh = SubResource("PlaneMesh_n7s7b")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Boden" unique_id=846841885]
 shape = SubResource("WorldBoundaryShape3D_xmjwg")
@@ -81,7 +104,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
 script = ExtResource("4_qpfqq")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=816081768]
-environment = SubResource("Environment_qpfqq")
+environment = SubResource("Environment_xvbrs")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=286375576]
 transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
