@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://0pbs6n5gnxs0"]
+
+[ext_resource type="Script" uid="uid://bbw2tr77npxmk" path="res://player.gd" id="1_xmjwg"]
+[ext_resource type="Script" uid="uid://cc3pciv5icryf" path="res://plant.gd" id="2_ddv0k"]
+[ext_resource type="Script" uid="uid://rlisg4twlwnn" path="res://tree.gd" id="3_cw7a8"]
+[ext_resource type="Script" uid="uid://dbd78lby23qlu" path="res://decision.gd" id="4_qpfqq"]
+[ext_resource type="Script" uid="uid://4vwtrw02wfsm" path="res://fox.gd" id="5_xx6p7"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q7od0"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xmjwg"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_q7od0"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_xmjwg"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_xmjwg"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ddv0k"]
+radius = 2.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ddv0k"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_xx6p7"]
+
+[sub_resource type="Environment" id="Environment_qpfqq"]
+adjustment_enabled = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_qpfqq"]
+
+[node name="FlüsterhainScene" type="Node3D" unique_id=627585724]
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=680603822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+script = ExtResource("1_xmjwg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player" unique_id=373402472]
+mesh = SubResource("CapsuleMesh_q7od0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=1166341842]
+shape = SubResource("CapsuleShape3D_xmjwg")
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1986163734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
+
+[node name="Boden" type="StaticBody3D" parent="." unique_id=1331204617]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Boden" unique_id=475825714]
+mesh = SubResource("PlaneMesh_q7od0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Boden" unique_id=846841885]
+shape = SubResource("WorldBoundaryShape3D_xmjwg")
+
+[node name="Plant" type="Node3D" parent="." unique_id=981694297]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -3)
+script = ExtResource("2_ddv0k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Plant" unique_id=1504507558]
+mesh = SubResource("SphereMesh_xmjwg")
+
+[node name="InteractZone" type="Area3D" parent="Plant" unique_id=1507693088]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Plant/InteractZone" unique_id=1320462456]
+shape = SubResource("SphereShape3D_ddv0k")
+
+[node name="Tree" type="Node3D" parent="." unique_id=1257224123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -3)
+script = ExtResource("3_cw7a8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Tree" unique_id=127566267]
+mesh = SubResource("CylinderMesh_ddv0k")
+
+[node name="InteractZone" type="Area3D" parent="Tree" unique_id=514111591]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tree/InteractZone" unique_id=971475652]
+transform = Transform3D(1, 0, 0, 0, 0.99939084, -0.034899496, 0, 0.034899496, 0.99939084, 0, 0, 0)
+shape = SubResource("SphereShape3D_xx6p7")
+
+[node name="WaterDecisionZone" type="Node3D" parent="." unique_id=941940346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("4_qpfqq")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=816081768]
+environment = SubResource("Environment_qpfqq")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=286375576]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
+
+[node name="Fox" type="Node3D" parent="." unique_id=43637006]
+script = ExtResource("5_xx6p7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Fox" unique_id=75569591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4)
+mesh = SubResource("BoxMesh_qpfqq")
+
+[connection signal="body_entered" from="Plant/InteractZone" to="Plant" method="_on_interact_zone_body_entered"]
+[connection signal="body_exited" from="Plant/InteractZone" to="Plant" method="_on_interact_zone_body_exited"]
+[connection signal="body_entered" from="Tree/InteractZone" to="Tree" method="_on_interact_zone_body_entered"]
+[connection signal="body_exited" from="Tree/InteractZone" to="Tree" method="_on_interact_zone_body_exited"]
