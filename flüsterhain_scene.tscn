@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bl57or6taaobg" path="res://player_figure.glb" id="2_xvbrs"]
 [ext_resource type="Script" uid="uid://rlisg4twlwnn" path="res://tree.gd" id="3_cw7a8"]
 [ext_resource type="Script" uid="uid://dbd78lby23qlu" path="res://decision.gd" id="4_qpfqq"]
+[ext_resource type="PackedScene" uid="uid://blhwg3mf3u1pt" path="res://tree_figure.glb" id="5_xhg2f"]
 [ext_resource type="Script" uid="uid://4vwtrw02wfsm" path="res://fox.gd" id="5_xx6p7"]
 [ext_resource type="AudioStream" uid="uid://ipuis3ss7y7p" path="res://170515__rolandasb__forest_ambient_01_loop.wav" id="6_xvbrs"]
 [ext_resource type="PackedScene" uid="uid://bov63llvp5au1" path="res://fio_figure.glb" id="7_st2r7"]
@@ -28,12 +29,6 @@ material = SubResource("StandardMaterial3D_xvbrs")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ddv0k"]
 radius = 2.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n7s7b"]
-albedo_color = Color(0.3137255, 0.19607843, 0.11764706, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_ddv0k"]
-material = SubResource("StandardMaterial3D_n7s7b")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_xx6p7"]
 
@@ -81,17 +76,16 @@ mesh = SubResource("SphereMesh_xmjwg")
 shape = SubResource("SphereShape3D_ddv0k")
 
 [node name="Tree" type="Node3D" parent="." unique_id=1257224123]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -3)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -3, 1, -3)
 script = ExtResource("3_cw7a8")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Tree" unique_id=127566267]
-mesh = SubResource("CylinderMesh_ddv0k")
 
 [node name="InteractZone" type="Area3D" parent="Tree" unique_id=514111591]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tree/InteractZone" unique_id=971475652]
 transform = Transform3D(1, 0, 0, 0, 0.99939084, -0.034899496, 0, 0.034899496, 0.99939084, 0, 0, 0)
 shape = SubResource("SphereShape3D_xx6p7")
+
+[node name="tree_figure" parent="Tree" unique_id=1384435591 instance=ExtResource("5_xhg2f")]
 
 [node name="WaterDecisionZone" type="Node3D" parent="." unique_id=941940346]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
