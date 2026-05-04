@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dbd78lby23qlu" path="res://decision.gd" id="4_qpfqq"]
 [ext_resource type="Script" uid="uid://4vwtrw02wfsm" path="res://fox.gd" id="5_xx6p7"]
 [ext_resource type="AudioStream" uid="uid://ipuis3ss7y7p" path="res://170515__rolandasb__forest_ambient_01_loop.wav" id="6_xvbrs"]
+[ext_resource type="PackedScene" uid="uid://bov63llvp5au1" path="res://fio_figure.glb" id="7_st2r7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xmjwg"]
 
@@ -45,12 +46,6 @@ sky_material = SubResource("ProceduralSkyMaterial_xx6p7")
 background_mode = 2
 sky = SubResource("Sky_n7s7b")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_st2r7"]
-albedo_color = Color(0.7058824, 0.39215687, 0.11764706, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_qpfqq"]
-material = SubResource("StandardMaterial3D_st2r7")
-
 [node name="FlüsterhainScene" type="Node3D" unique_id=627585724]
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=680603822]
@@ -63,7 +58,7 @@ shape = SubResource("CapsuleShape3D_xmjwg")
 [node name="Camera3D" type="Camera3D" parent="Player" unique_id=1986163734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
 
-[node name="player_figure" parent="Player" unique_id=178539933 instance=ExtResource("2_xvbrs")]
+[node name="player_figure" parent="Player" unique_id=1093171150 instance=ExtResource("2_xvbrs")]
 
 [node name="Boden" type="StaticBody3D" parent="." unique_id=1331204617]
 
@@ -109,11 +104,10 @@ environment = SubResource("Environment_xvbrs")
 transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
 
 [node name="Fox" type="Node3D" parent="." unique_id=43637006]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0.5, -1)
 script = ExtResource("5_xx6p7")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Fox" unique_id=75569591]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4)
-mesh = SubResource("BoxMesh_qpfqq")
+[node name="fio_figure" parent="Fox" unique_id=2137682320 instance=ExtResource("7_st2r7")]
 
 [node name="AmbientSound" type="AudioStreamPlayer" parent="." unique_id=1862584676]
 stream = ExtResource("6_xvbrs")
