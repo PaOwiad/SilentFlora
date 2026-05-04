@@ -104,7 +104,7 @@ environment = SubResource("Environment_xvbrs")
 transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
 
 [node name="Fox" type="Node3D" parent="." unique_id=43637006]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0.5, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.3, -2)
 script = ExtResource("5_xx6p7")
 
 [node name="fio_figure" parent="Fox" unique_id=2137682320 instance=ExtResource("7_st2r7")]
