@@ -28,6 +28,9 @@ radius = 2.0
 [sub_resource type="SphereShape3D" id="SphereShape3D_xx6p7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_xx6p7"]
+sky_top_color = Color(0.735357, 0.85430586, 0.9776916, 1)
+sky_horizon_color = Color(0.85430586, 0.9063318, 0.85430586, 1)
+ground_bottom_color = Color(0.42358288, 0.5370987, 0.42358288, 1)
 
 [sub_resource type="Sky" id="Sky_n7s7b"]
 sky_material = SubResource("ProceduralSkyMaterial_xx6p7")
@@ -35,6 +38,12 @@ sky_material = SubResource("ProceduralSkyMaterial_xx6p7")
 [sub_resource type="Environment" id="Environment_xvbrs"]
 background_mode = 2
 sky = SubResource("Sky_n7s7b")
+fog_mode = 1
+fog_light_color = Color(0.7977378, 0.8808251, 0.7977378, 1)
+fog_density = 0.02
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.03
+volumetric_fog_albedo = Color(0.85430586, 0.9309246, 0.85430586, 1)
 
 [node name="FlüsterhainScene" type="Node3D" unique_id=627585724]
 
