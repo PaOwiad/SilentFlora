@@ -2,12 +2,11 @@
 
 [ext_resource type="Script" uid="uid://bbw2tr77npxmk" path="res://player.gd" id="1_xmjwg"]
 [ext_resource type="Script" uid="uid://cc3pciv5icryf" path="res://plant.gd" id="2_ddv0k"]
+[ext_resource type="PackedScene" uid="uid://bl57or6taaobg" path="res://player_figure.glb" id="2_xvbrs"]
 [ext_resource type="Script" uid="uid://rlisg4twlwnn" path="res://tree.gd" id="3_cw7a8"]
 [ext_resource type="Script" uid="uid://dbd78lby23qlu" path="res://decision.gd" id="4_qpfqq"]
 [ext_resource type="Script" uid="uid://4vwtrw02wfsm" path="res://fox.gd" id="5_xx6p7"]
 [ext_resource type="AudioStream" uid="uid://ipuis3ss7y7p" path="res://170515__rolandasb__forest_ambient_01_loop.wav" id="6_xvbrs"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q7od0"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xmjwg"]
 
@@ -58,14 +57,13 @@ material = SubResource("StandardMaterial3D_st2r7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 script = ExtResource("1_xmjwg")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Player" unique_id=373402472]
-mesh = SubResource("CapsuleMesh_q7od0")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=1166341842]
 shape = SubResource("CapsuleShape3D_xmjwg")
 
 [node name="Camera3D" type="Camera3D" parent="Player" unique_id=1986163734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
+
+[node name="player_figure" parent="Player" unique_id=178539933 instance=ExtResource("2_xvbrs")]
 
 [node name="Boden" type="StaticBody3D" parent="." unique_id=1331204617]
 
