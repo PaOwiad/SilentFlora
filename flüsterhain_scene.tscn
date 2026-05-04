@@ -57,7 +57,7 @@ shape = SubResource("CapsuleShape3D_xmjwg")
 [node name="Camera3D" type="Camera3D" parent="Player" unique_id=1986163734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5)
 
-[node name="player_figure" parent="Player" unique_id=1093171150 instance=ExtResource("2_xvbrs")]
+[node name="player_figure" parent="Player" unique_id=1260589575 instance=ExtResource("2_xvbrs")]
 
 [node name="Boden" type="StaticBody3D" parent="." unique_id=1331204617]
 
