@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SilentFlora — The Living Ecosystem</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #050507;
+    --deep: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --green-dark: #0d3320;
+    --green-mid: #1a5c38;
+    --green: #2d9e5f;
+    --green-light: #4ecb82;
+    --green-glow: rgba(45,158,95,0.15);
+    --amber: #c8922a;
+    --blue-earth: #1a4a8a;
+    --text: #e8e4d9;
+    --text-muted: #7a7870;
+    --text-dim: #3a3832;
+    --border: rgba(255,255,255,0.06);
+    --border-green: rgba(45,158,95,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Cursor */
+  .cursor { position:fixed; width:8px; height:8px; background:var(--green-light); border-radius:50%; pointer-events:none; z-index:9999; transition:transform 0.1s; mix-blend-mode:screen; }
+  .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(78,203,130,0.4); border-radius:50%; pointer-events:none; z-index:9998; transition:all 0.15s; }
+
+  /* Noise */
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
+
+  /* LANGUAGE SWITCHER */
+  .lang-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    background: rgba(5,5,7,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 48px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    backdrop-filter: blur(8px);
+  }
+
+  .lang-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 4px 10px;
+    cursor: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .lang-btn:hover { color: var(--green-light); border-color: var(--border-green); }
+  .lang-btn.active { color: var(--green-light); border-color: var(--border-green); background: var(--green-glow); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 33px; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(5,5,7,0.9), transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo { font-family:'Space Mono',monospace; font-size:13px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
+  .nav-links { display:flex; gap:40px; list-style:none; }
+  .nav-links a { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.15em; color:var(--text-muted); text-decoration:none; text-transform:uppercase; transition:color 0.3s; }
+  .nav-links a:hover { color:var(--green-light); }
+  .nav-cta { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; color:var(--green-light); border:1px solid var(--border-green); padding:10px 20px; text-decoration:none; text-transform:uppercase; transition:all 0.3s; }
+  .nav-cta:hover { background:var(--green-glow); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 160px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg { position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 70% 50%, rgba(13,51,32,0.4) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45,158,95,0.08) 0%, transparent 60%); }
+
+  .orb { position:absolute; border-radius:50%; filter:blur(80px); animation:orbFloat 12s ease-in-out infinite; pointer-events:none; }
+  .orb-1 { width:500px; height:500px; background:radial-gradient(circle, rgba(45,158,95,0.12), transparent 70%); right:-100px; top:10%; }
+  .orb-2 { width:300px; height:300px; background:radial-gradient(circle, rgba(13,51,32,0.3), transparent 70%); left:10%; bottom:20%; animation-delay:-4s; }
+  .orb-3 { width:200px; height:200px; background:radial-gradient(circle, rgba(78,203,130,0.06), transparent 70%); right:30%; top:30%; animation-delay:-8s; }
+
+  @keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.05)} 66%{transform:translate(-20px,15px) scale(0.95)} }
+
+  .hero-content { position:relative; z-index:2; max-width:900px; }
+  .hero-eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.3em; color:var(--green); text-transform:uppercase; margin-bottom:24px; opacity:0; animation:fadeUp 1s ease 0.3s forwards; }
+  .hero-title { font-size:clamp(64px,10vw,140px); font-weight:300; line-height:0.9; letter-spacing:-0.02em; margin-bottom:8px; opacity:0; animation:fadeUp 1s ease 0.5s forwards; }
+  .hero-title em { font-style:italic; color:var(--green-light); }
+  .hero-title-2 { font-size:clamp(64px,10vw,140px); font-weight:300; line-height:0.9; letter-spacing:-0.02em; color:var(--text-dim); margin-bottom:48px; opacity:0; animation:fadeUp 1s ease 0.7s forwards; }
+  .hero-sub { font-size:20px; font-weight:300; line-height:1.7; color:var(--text-muted); max-width:560px; margin-bottom:56px; opacity:0; animation:fadeUp 1s ease 0.9s forwards; }
+  .hero-actions { display:flex; gap:20px; align-items:center; opacity:0; animation:fadeUp 1s ease 1.1s forwards; }
+
+  .btn-primary { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--black); background:var(--green-light); padding:16px 32px; text-decoration:none; transition:all 0.3s; border:none; cursor:none; display:inline-block; }
+  .btn-primary:hover { background:var(--green); transform:translateY(-2px); }
+  .btn-secondary { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); text-decoration:none; display:flex; align-items:center; gap:8px; transition:color 0.3s; }
+  .btn-secondary:hover { color:var(--green-light); }
+
+  /* EARTH TOKEN */
+  .token-badge {
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    opacity: 0;
+    animation: fadeIn 1.5s ease 1.5s forwards;
+  }
+
+  .token-ring-outer {
+    width: 300px; height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Outer spinning ring */
+  .ring-orbit {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border-green);
+    animation: spin 20s linear infinite;
+  }
+
+  .ring-orbit::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0%, var(--green) 8%, transparent 16%);
+    animation: spin 3s linear infinite;
+    -webkit-mask: radial-gradient(circle at center, transparent 48%, black 49%);
+  }
+
+  /* Dots on orbit */
+  .orbit-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--green-light);
+    border-radius: 50%;
+    top: -3px;
+    left: calc(50% - 3px);
+    transform-origin: 3px 153px;
+    box-shadow: 0 0 8px var(--green-light);
+  }
+
+  .orbit-dot:nth-child(2) { animation: spin 20s linear infinite; }
+  .orbit-dot:nth-child(3) { animation: spin 20s linear infinite; animation-delay: -6.6s; }
+  .orbit-dot:nth-child(4) { animation: spin 20s linear infinite; animation-delay: -13.3s; }
+
+  /* Inner ring */
+  .ring-inner {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1px solid rgba(78,203,130,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: spinReverse 40s linear infinite;
+  }
+
+  /* Earth SVG center */
+  .earth-center {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 40px rgba(45,158,95,0.3),
+      0 0 80px rgba(45,158,95,0.1),
+      inset 0 0 20px rgba(0,0,0,0.5);
+    animation: spinEarth 60s linear infinite;
+  }
+
+  .earth-svg {
+    width: 100%; height: 100%;
+  }
+
+  .token-label {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .token-label-sym {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--green-light);
+    letter-spacing: 0.3em;
+  }
+
+  .token-label-net {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes spinReverse { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
+  @keyframes spinEarth { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* STATS */
+  .stats-bar { position:relative; z-index:2; border-top:1px solid var(--border); padding:32px 48px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; opacity:0; animation:fadeUp 1s ease 1.3s forwards; }
+  .stat { padding:0 32px; border-right:1px solid var(--border); }
+  .stat:first-child { padding-left:0; }
+  .stat:last-child { border-right:none; }
+  .stat-value { font-size:36px; font-weight:300; color:var(--text); letter-spacing:-0.02em; }
+  .stat-value span { color:var(--green-light); }
+  .stat-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; margin-top:4px; }
+
+  /* SECTIONS */
+  section { padding:120px 48px; position:relative; }
+  .section-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.3em; color:var(--green); text-transform:uppercase; margin-bottom:16px; }
+  .section-title { font-size:clamp(40px,6vw,80px); font-weight:300; line-height:1.05; letter-spacing:-0.02em; margin-bottom:24px; }
+  .section-sub { font-size:18px; font-weight:300; color:var(--text-muted); line-height:1.8; max-width:560px; margin-bottom:64px; }
+
+  /* PILLARS */
+  .pillars { background:var(--deep); }
+  .pillars-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:64px; }
+  .pillar { background:var(--card); padding:48px 40px; position:relative; overflow:hidden; transition:background 0.4s; }
+  .pillar::before { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--green); transform:scaleX(0); transition:transform 0.4s; transform-origin:left; }
+  .pillar:hover { background:var(--surface); }
+  .pillar:hover::before { transform:scaleX(1); }
+  .pillar-number { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.2em; margin-bottom:32px; }
+  .pillar-icon { font-size:40px; margin-bottom:24px; }
+  .pillar-title { font-size:28px; font-weight:400; margin-bottom:16px; }
+  .pillar-title em { font-style:italic; color:var(--green-light); }
+  .pillar-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
+
+  /* ECO */
+  .ecosystem { background:var(--black); }
+  .ecosystem-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:64px; }
+  .eco-card { background:var(--card); border:1px solid var(--border); padding:40px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .eco-card:hover { border-color:var(--border-green); }
+  .eco-card::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(to right, transparent, var(--green), transparent); opacity:0; transition:opacity 0.4s; }
+  .eco-card:hover::after { opacity:1; }
+  .eco-tag { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .eco-tag::before { content:''; width:20px; height:1px; background:var(--green); }
+  .eco-title { font-size:28px; font-weight:300; margin-bottom:16px; line-height:1.2; }
+  .eco-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
+
+  /* TOKEN SECTION */
+  .token-section { background:var(--deep); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .token-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+  .token-info h2 { font-size:clamp(40px,5vw,72px); font-weight:300; line-height:1.05; margin-bottom:24px; }
+  .token-info h2 em { font-style:italic; color:var(--green-light); }
+  .token-info p { font-size:18px; font-weight:300; color:var(--text-muted); line-height:1.8; margin-bottom:40px; }
+  .token-address { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:16px 20px; letter-spacing:0.05em; margin-bottom:32px; word-break:break-all; line-height:1.6; }
+  .token-address span { display:block; font-size:9px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:8px; }
+  .tokenomics { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); }
+  .trow { display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid var(--border); transition:background 0.2s; }
+  .trow:last-child { border-bottom:none; }
+  .trow:hover { background:var(--surface); }
+  .trow-label { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; color:var(--text-muted); text-transform:uppercase; }
+  .trow-value { font-size:20px; font-weight:300; color:var(--text); }
+  .trow-value.green { color:var(--green-light); }
+
+  /* GAME */
+  .game-section { background:var(--black); }
+  .game-inner { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+  .game-frame { aspect-ratio:1; border:1px solid var(--border-green); background:var(--card); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  .game-frame::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 40%, rgba(45,158,95,0.15), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(13,51,32,0.3), transparent 50%); }
+  .game-placeholder { font-size:100px; opacity:0.2; z-index:1; }
+  .game-label { position:absolute; bottom:20px; left:20px; right:20px; font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; }
+  .game-corner { position:absolute; width:20px; height:20px; border-color:var(--green); border-style:solid; }
+  .game-corner.tl { top:-1px; left:-1px; border-width:2px 0 0 2px; }
+  .game-corner.tr { top:-1px; right:-1px; border-width:2px 2px 0 0; }
+  .game-corner.bl { bottom:-1px; left:-1px; border-width:0 0 2px 2px; }
+  .game-corner.br { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+
+  /* MANIFESTO */
+  .manifesto { background:var(--green-dark); border-top:1px solid var(--border-green); border-bottom:1px solid var(--border-green); text-align:center; padding:120px 48px; }
+  .manifesto-quote { font-size:clamp(24px,3.5vw,48px); font-weight:300; font-style:italic; line-height:1.5; max-width:860px; margin:0 auto 32px; color:var(--text); }
+  .manifesto-attr { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
+
+  /* CTA */
+  .cta-section { background:var(--black); text-align:center; padding:160px 48px; }
+  .cta-section h2 { font-size:clamp(48px,8vw,100px); font-weight:300; line-height:1.0; margin-bottom:32px; }
+  .cta-section h2 em { font-style:italic; color:var(--green-light); }
+  .cta-section p { font-size:18px; color:var(--text-muted); margin-bottom:48px; font-weight:300; }
+  .cta-actions { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--border); padding:40px 48px; display:flex; justify-content:space-between; align-items:center; }
+  .footer-logo { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
+  .footer-text { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.1em; }
+  .footer-links { display:flex; gap:32px; }
+  .footer-links a { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; color:var(--text-muted); text-decoration:none; text-transform:uppercase; transition:color 0.3s; }
+  .footer-links a:hover { color:var(--green-light); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  .reveal { opacity:0; transform:translateY(40px); transition:opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--black); }
+  ::-webkit-scrollbar-thumb { background:var(--green-dark); }
+
+  @media (max-width:900px) {
+    .lang-bar { padding:8px 16px; }
+    nav { padding:20px 24px; top:33px; }
+    .nav-links { display:none; }
+    .hero { padding:140px 24px 60px; }
+    .token-badge { display:none; }
+    .stats-bar { grid-template-columns:repeat(2,1fr); padding:24px; }
+    section { padding:80px 24px; }
+    .pillars-grid,.ecosystem-grid,.token-grid,.game-inner { grid-template-columns:1fr; }
+    footer { flex-direction:column; gap:20px; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- LANGUAGE BAR -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+  <button class="lang-btn" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn" onclick="setLang('es')">ES</button>
+  <button class="lang-btn" onclick="setLang('zh')">中文</button>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
+  <ul class="nav-links">
+    <li><a href="#ecosystem" data-i18n="nav_ecosystem">Ecosystem</a></li>
+    <li><a href="#token" data-i18n="nav_token">Token</a></li>
+    <li><a href="#game" data-i18n="nav_game">Game</a></li>
+    <li><a href="#manifesto" data-i18n="nav_manifesto">Manifesto</a></li>
+  </ul>
+  <a href="#token" class="nav-cta" data-i18n="nav_cta">Get SFLR</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Decentralized AI Ecosystem — Polygon Network</p>
+    <h1 class="hero-title">Silent<em>Flora</em></h1>
+    <h2 class="hero-title-2">Ecosystem</h2>
+    <p class="hero-sub" data-i18n="hero_sub">No mining. No wasted energy. Real action is rewarded — through playing, creating and making an impact. This is the new economy.</p>
+    <div class="hero-actions">
+      <a href="#token" class="btn-primary" data-i18n="hero_btn1">Discover Token</a>
+      <a href="#game" class="btn-secondary" data-i18n="hero_btn2">The Game →</a>
+    </div>
+  </div>
+
+  <!-- EARTH TOKEN BADGE -->
+  <div class="token-badge">
+    <div class="token-ring-outer">
+      <div class="ring-orbit">
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+      </div>
+      <div class="ring-inner">
+        <div class="earth-center">
+          <!-- Earth SVG - animated planet -->
+          <svg class="earth-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="earthClip">
+                <circle cx="80" cy="80" r="78"/>
+              </clipPath>
+              <radialGradient id="earthLight" cx="35%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
+              </radialGradient>
+              <radialGradient id="atmosphereGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="80%" stop-color="transparent"/>
+                <stop offset="100%" stop-color="rgba(78,203,130,0.2)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Ocean base -->
+            <circle cx="80" cy="80" r="78" fill="#0d2b4a" clip-path="url(#earthClip)"/>
+
+            <!-- Continents / land masses -->
+            <g clip-path="url(#earthClip)">
+              <!-- Ocean deep -->
+              <rect x="0" y="0" width="160" height="160" fill="#0d2b4a"/>
+              <!-- Ocean mid -->
+              <ellipse cx="80" cy="80" rx="78" ry="78" fill="#0f3a5e"/>
+
+              <!-- Europe/Africa -->
+              <path d="M75 20 Q85 18 90 28 Q95 35 88 45 Q95 50 92 60 Q98 70 95 85 Q100 95 92 105 Q88 115 80 120 Q72 125 68 115 Q60 110 62 98 Q55 88 58 75 Q52 65 56 52 Q58 40 65 30 Z" fill="#2d7a3a" opacity="0.9"/>
+
+              <!-- Americas -->
+              <path d="M25 30 Q35 25 42 35 Q48 45 44 58 Q50 68 46 80 Q52 92 48 105 Q42 118 35 122 Q28 125 22 115 Q15 105 18 92 Q12 80 15 68 Q10 55 15 42 Q18 33 25 30 Z" fill="#2d7a3a" opacity="0.85"/>
+
+              <!-- Asia/Russia -->
+              <path d="M95 15 Q115 12 130 20 Q145 28 148 42 Q152 55 145 65 Q150 75 144 85 Q140 95 128 98 Q115 100 105 92 Q95 88 92 78 Q86 68 90 56 Q88 44 92 32 Z" fill="#2d7a3a" opacity="0.9"/>
+
+              <!-- Australia -->
+              <path d="M118 105 Q128 102 135 110 Q140 118 135 128 Q128 135 118 132 Q110 128 108 118 Q108 108 118 105 Z" fill="#3d8a46" opacity="0.8"/>
+
+              <!-- Ice caps -->
+              <ellipse cx="80" cy="5" rx="50" ry="10" fill="rgba(220,240,255,0.4)"/>
+              <ellipse cx="80" cy="155" rx="45" ry="10" fill="rgba(220,240,255,0.35)"/>
+
+              <!-- Cloud layers -->
+              <ellipse cx="60" cy="45" rx="25" ry="8" fill="rgba(255,255,255,0.12)" transform="rotate(-15,60,45)"/>
+              <ellipse cx="110" cy="70" rx="20" ry="6" fill="rgba(255,255,255,0.1)" transform="rotate(10,110,70)"/>
+              <ellipse cx="40" cy="90" rx="18" ry="5" fill="rgba(255,255,255,0.08)"/>
+              <ellipse cx="95" cy="110" rx="22" ry="6" fill="rgba(255,255,255,0.1)" transform="rotate(-8,95,110)"/>
+
+              <!-- Light overlay -->
+              <circle cx="80" cy="80" r="78" fill="url(#earthLight)"/>
+            </g>
+
+            <!-- Atmosphere glow -->
+            <circle cx="80" cy="80" r="78" fill="none" stroke="rgba(78,203,130,0.3)" stroke-width="4"/>
+            <circle cx="80" cy="80" r="80" fill="url(#atmosphereGrad)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="token-label">
+      <div class="token-label-sym">SFLR</div>
+      <div class="token-label-net">Polygon Mainnet</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value">100<span>M</span></div><div class="stat-label" data-i18n="stat1">Total Supply</div></div>
+  <div class="stat"><div class="stat-value">0<span>%</span></div><div class="stat-label" data-i18n="stat2">Mining Required</div></div>
+  <div class="stat"><div class="stat-value">3</div><div class="stat-label" data-i18n="stat3">Earn Methods</div></div>
+  <div class="stat"><div class="stat-value">1<span>%</span></div><div class="stat-label" data-i18n="stat4">Ecosystem Fee</div></div>
+</div>
+
+<!-- PILLARS -->
+<section class="pillars" id="ecosystem">
+  <div class="reveal">
+    <p class="section-label" data-i18n="pillars_label">The Three Pillars</p>
+    <h2 class="section-title" data-i18n="pillars_title">How you<br><em style="font-style:italic;color:#4ecb82">earn</em></h2>
+    <p class="section-sub" data-i18n="pillars_sub">SFLR is not mined — it is earned. Through three fundamental ways of acting.</p>
+  </div>
+  <div class="pillars-grid reveal">
+    <div class="pillar">
+      <div class="pillar-number">01 —</div>
+      <div class="pillar-icon">🎮</div>
+      <h3 class="pillar-title">Proof of <em>Play</em></h3>
+      <p class="pillar-text" data-i18n="pillar1_text">Play, contribute, shape the community. SilentFlora rewards genuine playtime and creative contributions to the game ecosystem.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-number">02 —</div>
+      <div class="pillar-icon">🧠</div>
+      <h3 class="pillar-title">Proof of <em>Creativity</em></h3>
+      <p class="pillar-text" data-i18n="pillar2_text">Art, music, stories, mods. The community votes — good content is rewarded with SFLR. AI validates quality.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-number">03 —</div>
+      <div class="pillar-icon">🌍</div>
+      <h3 class="pillar-title">Proof of <em>Impact</em></h3>
+      <p class="pillar-text" data-i18n="pillar3_text">Real actions beyond the screen. Verified positive contributions to the world — rewarded in SFLR.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section class="ecosystem">
+  <div class="reveal">
+    <p class="section-label" data-i18n="eco_label">The Ecosystem</p>
+    <h2 class="section-title" data-i18n="eco_title">More than<br>a token</h2>
+  </div>
+  <div class="ecosystem-grid reveal">
+    <div class="eco-card">
+      <div class="eco-tag">AI Platform</div>
+      <h3 class="eco-title" data-i18n="eco1_title">AI services payable in SFLR, BTC, ETH</h3>
+      <p class="eco-text" data-i18n="eco1_text">Text, image, video, code, documentation — all AI services in the ecosystem accept multiple currencies. SFLR holders get advantages.</p>
+    </div>
+    <div class="eco-card">
+      <div class="eco-tag">SFLR Home</div>
+      <h3 class="eco-title" data-i18n="eco2_title">Your personal AI agent</h3>
+      <p class="eco-text" data-i18n="eco2_text">Connects to everything. Does what you tell it. The first truly decentralized home assistant — powered by SFLR.</p>
+    </div>
+    <div class="eco-card">
+      <div class="eco-tag">Governance</div>
+      <h3 class="eco-title" data-i18n="eco3_title">The community decides</h3>
+      <p class="eco-text" data-i18n="eco3_text">SFLR holders vote. New features, partnerships, token releases — real decentralized democracy in the ecosystem.</p>
+    </div>
+    <div class="eco-card">
+      <div class="eco-tag">Multi-Chain</div>
+      <h3 class="eco-title" data-i18n="eco4_title">Pay with what you want</h3>
+      <p class="eco-text" data-i18n="eco4_text">BTC, ETH, BNB, SFLR — the ecosystem accepts everything. SFLR is the house currency with extra benefits, never mandatory.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOKEN -->
+<section class="token-section" id="token">
+  <div class="token-grid">
+    <div class="token-info reveal">
+      <p class="section-label" data-i18n="token_label">The Token</p>
+      <h2>SFLR —<br>the <em>silent</em><br>currency</h2>
+      <p data-i18n="token_sub">Designed for an ecosystem that grows. Not for speculation — for real utility. Every transaction strengthens the system.</p>
+      <div class="token-address">
+        <span>Contract Address — Polygon Mainnet</span>
+        0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E
+      </div>
+      <div class="hero-actions">
+        <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="btn-primary" data-i18n="token_btn">View on Polygonscan →</a>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="tokenomics">
+        <div class="trow"><span class="trow-label">Total Supply</span><span class="trow-value green">100,000,000 SFLR</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok1">Community / Earn</span><span class="trow-value">40%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok2">Ecosystem / Game</span><span class="trow-value">25%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok3">Pre-Sale (ICO)</span><span class="trow-value">20%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok4">Team / Reserve</span><span class="trow-value">15%</span></div>
+        <div class="trow"><span class="trow-label">Blockchain</span><span class="trow-value green">Polygon</span></div>
+        <div class="trow"><span class="trow-label">Mining</span><span class="trow-value" data-i18n="tok5">None ✓</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GAME -->
+<section class="game-section" id="game">
+  <div class="game-inner">
+    <div class="reveal">
+      <p class="section-label" data-i18n="game_label">The Game</p>
+      <h2 class="section-title" data-i18n="game_title">What happens<br>when we act<br><em style="font-style:italic;color:#4ecb82">wrongly</em></h2>
+      <p class="section-sub" data-i18n="game_sub">SilentFlora — the game — shows what is at stake. Not as a lecture. As an experience. The ecosystem rewards those who understand the lesson.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-secondary" data-i18n="game_btn">Game coming soon →</a>
+      </div>
+    </div>
+    <div class="game-visual reveal">
+      <div class="game-frame">
+        <div class="game-corner tl"></div>
+        <div class="game-corner tr"></div>
+        <div class="game-corner bl"></div>
+        <div class="game-corner br"></div>
+        <div class="game-placeholder">🌿</div>
+        <div class="game-label">SilentFlora — Godot Engine — In Development</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <blockquote class="manifesto-quote reveal" data-i18n="manifesto_quote">"I am not a do-gooder. But I see how we are destroying everything with the wrong incentives."</blockquote>
+  <p class="manifesto-attr reveal">— @Silentflora, Founder</p>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="reveal" data-i18n="cta_title">Ready for the<br><em>Ecosystem?</em></h2>
+  <p class="reveal" data-i18n="cta_sub">SFLR is live on Polygon. Become part of the first community.</p>
+  <div class="cta-actions reveal">
+    <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="btn-primary" data-i18n="cta_btn1">View Token</a>
+    <a href="#ecosystem" class="btn-secondary" data-i18n="cta_btn2">Learn more →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
+  <div class="footer-text">SFLR — Polygon Mainnet — 2025</div>
+  <div class="footer-links">
+    <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank">Polygonscan</a>
+    <a href="#" data-i18n="footer_wp">Whitepaper</a>
+    <a href="#">Discord</a>
+  </div>
+</footer>
+
+<script>
+// ============ TRANSLATIONS ============
+const i18n = {
+  en: {
+    nav_ecosystem: 'Ecosystem', nav_token: 'Token', nav_game: 'Game', nav_manifesto: 'Manifesto', nav_cta: 'Get SFLR',
+    hero_eyebrow: 'Decentralized AI Ecosystem — Polygon Network',
+    hero_sub: 'No mining. No wasted energy. Real action is rewarded — through playing, creating and making an impact. This is the new economy.',
+    hero_btn1: 'Discover Token', hero_btn2: 'The Game →',
+    stat1: 'Total Supply', stat2: 'Mining Required', stat3: 'Earn Methods', stat4: 'Ecosystem Fee',
+    pillars_label: 'The Three Pillars', pillars_title: 'How you\n<em style="font-style:italic;color:#4ecb82">earn</em>',
+    pillars_sub: 'SFLR is not mined — it is earned. Through three fundamental ways of acting.',
+    pillar1_text: 'Play, contribute, shape the community. SilentFlora rewards genuine playtime and creative contributions to the game ecosystem.',
+    pillar2_text: 'Art, music, stories, mods. The community votes — good content is rewarded with SFLR. AI validates quality.',
+    pillar3_text: 'Real actions beyond the screen. Verified positive contributions to the world — rewarded in SFLR.',
+    eco_label: 'The Ecosystem', eco_title: 'More than\na token',
+    eco1_title: 'AI services payable in SFLR, BTC, ETH', eco1_text: 'Text, image, video, code, documentation — all AI services accept multiple currencies. SFLR holders get advantages.',
+    eco2_title: 'Your personal AI agent', eco2_text: 'Connects to everything. Does what you tell it. The first truly decentralized home assistant — powered by SFLR.',
+    eco3_title: 'The community decides', eco3_text: 'SFLR holders vote. New features, partnerships, token releases — real decentralized democracy.',
+    eco4_title: 'Pay with what you want', eco4_text: 'BTC, ETH, BNB, SFLR — the ecosystem accepts everything. SFLR is the house currency with extra benefits, never mandatory.',
+    token_label: 'The Token', token_sub: 'Designed for an ecosystem that grows. Not for speculation — for real utility. Every transaction strengthens the system.',
+    token_btn: 'View on Polygonscan →',
+    tok1: 'Community / Earn', tok2: 'Ecosystem / Game', tok3: 'Pre-Sale (ICO)', tok4: 'Team / Reserve', tok5: 'None ✓',
+    game_label: 'The Game', game_title: 'What happens\nwhen we act\n<em style="font-style:italic;color:#4ecb82">wrongly</em>',
+    game_sub: 'SilentFlora — the game — shows what is at stake. Not as a lecture. As an experience. The ecosystem rewards those who understand the lesson.',
+    game_btn: 'Game coming soon →',
+    manifesto_quote: '"I am not a do-gooder. But I see how we are destroying everything with the wrong incentives."',
+    cta_title: 'Ready for the\n<em>Ecosystem?</em>', cta_sub: 'SFLR is live on Polygon. Become part of the first community.',
+    cta_btn1: 'View Token', cta_btn2: 'Learn more →', footer_wp: 'Whitepaper'
+  },
+  de: {
+    nav_ecosystem: 'Ökosystem', nav_token: 'Token', nav_game: 'Game', nav_manifesto: 'Manifest', nav_cta: 'SFLR holen',
+    hero_eyebrow: 'Dezentrales KI-Ökosystem — Polygon Netzwerk',
+    hero_sub: 'Kein Mining. Keine verschwendete Energie. Echtes Handeln wird belohnt — durch Spielen, Kreieren und Impact. Das ist die neue Ökonomie.',
+    hero_btn1: 'Token entdecken', hero_btn2: 'Das Game →',
+    stat1: 'Gesamtangebot', stat2: 'Mining nötig', stat3: 'Verdienst-Wege', stat4: 'Ökosystem-Gebühr',
+    pillars_label: 'Die drei Säulen', pillars_title: 'Wie du\n<em style="font-style:italic;color:#4ecb82">verdienst</em>',
+    pillars_sub: 'SFLR wird nicht geschürft — er wird verdient. Durch drei fundamentale Arten des Handelns.',
+    pillar1_text: 'Spielen, beitragen, die Community gestalten. SilentFlora belohnt echte Spielzeit und kreative Beiträge.',
+    pillar2_text: 'Kunst, Musik, Stories, Mods. Die Community bewertet — gute Inhalte werden mit SFLR vergütet.',
+    pillar3_text: 'Echte Handlungen ausserhalb des Screens. Verifizierte positive Beiträge zur Welt — belohnt in SFLR.',
+    eco_label: 'Das Ökosystem', eco_title: 'Mehr als\nein Token',
+    eco1_title: 'KI-Dienste zahlbar in SFLR, BTC, ETH', eco1_text: 'Text, Bild, Video, Code, Dokumentation — alle KI-Services akzeptieren verschiedene Währungen.',
+    eco2_title: 'Dein persönlicher KI-Agent', eco2_text: 'Verbindet sich mit allem. Steuert was du ihm sagst. Der erste wirklich dezentrale Heimassistent.',
+    eco3_title: 'Die Community entscheidet', eco3_text: 'SFLR-Halter stimmen ab. Neue Features, Partnerships, Token-Releases — echte dezentrale Demokratie.',
+    eco4_title: 'Zahle womit du willst', eco4_text: 'BTC, ETH, BNB, SFLR — das Ökosystem akzeptiert alles. SFLR ist die Hauswährung mit Vorteilen, kein Zwang.',
+    token_label: 'Der Token', token_sub: 'Designed für ein Ökosystem das wächst. Nicht für Spekulation — für echten Nutzen.',
+    token_btn: 'Auf Polygonscan ansehen →',
+    tok1: 'Community / Verdienen', tok2: 'Ökosystem / Game', tok3: 'Vorverkauf (ICO)', tok4: 'Team / Reserve', tok5: 'Keins ✓',
+    game_label: 'Das Game', game_title: 'Was passiert,\nwenn wir\n<em style="font-style:italic;color:#4ecb82">falsch</em> handeln',
+    game_sub: 'SilentFlora — das Game — zeigt was auf dem Spiel steht. Nicht als Predigt. Als Erfahrung.',
+    game_btn: 'Game coming soon →',
+    manifesto_quote: '"Ich bin kein Weltverbesserer – aber ich sehe, wie wir mit den falschen Anreizen alles zerstören."',
+    cta_title: 'Bereit für das\n<em>Ökosystem?</em>', cta_sub: 'SFLR ist live auf Polygon. Werde Teil der ersten Community.',
+    cta_btn1: 'Token ansehen', cta_btn2: 'Mehr erfahren →', footer_wp: 'Whitepaper'
+  },
+  fr: {
+    nav_ecosystem: 'Écosystème', nav_token: 'Token', nav_game: 'Jeu', nav_manifesto: 'Manifeste', nav_cta: 'Obtenir SFLR',
+    hero_eyebrow: 'Écosystème IA Décentralisé — Réseau Polygon',
+    hero_sub: 'Pas de minage. Pas d\'énergie gaspillée. L\'action réelle est récompensée — par le jeu, la création et l\'impact. C\'est la nouvelle économie.',
+    hero_btn1: 'Découvrir le Token', hero_btn2: 'Le Jeu →',
+    stat1: 'Offre Totale', stat2: 'Minage Requis', stat3: 'Méthodes de Gain', stat4: 'Frais Écosystème',
+    pillars_label: 'Les Trois Piliers', pillars_title: 'Comment vous\n<em style="font-style:italic;color:#4ecb82">gagnez</em>',
+    pillars_sub: 'SFLR n\'est pas miné — il est gagné. À travers trois façons fondamentales d\'agir.',
+    pillar1_text: 'Jouez, contribuez, façonnez la communauté. SilentFlora récompense le temps de jeu réel et les contributions créatives.',
+    pillar2_text: 'Art, musique, histoires, mods. La communauté vote — le bon contenu est récompensé en SFLR.',
+    pillar3_text: 'Actions réelles au-delà de l\'écran. Contributions positives vérifiées au monde — récompensées en SFLR.',
+    eco_label: 'L\'Écosystème', eco_title: 'Plus qu\'un\ntoken',
+    eco1_title: 'Services IA payables en SFLR, BTC, ETH', eco1_text: 'Texte, image, vidéo, code — tous les services IA acceptent plusieurs devises. Les détenteurs SFLR obtiennent des avantages.',
+    eco2_title: 'Votre agent IA personnel', eco2_text: 'Se connecte à tout. Fait ce que vous lui dites. Le premier assistant domestique vraiment décentralisé.',
+    eco3_title: 'La communauté décide', eco3_text: 'Les détenteurs SFLR votent. Nouvelles fonctionnalités, partenariats, démos de tokens — vraie démocratie décentralisée.',
+    eco4_title: 'Payez avec ce que vous voulez', eco4_text: 'BTC, ETH, BNB, SFLR — l\'écosystème accepte tout. SFLR est la devise maison avec des avantages supplémentaires.',
+    token_label: 'Le Token', token_sub: 'Conçu pour un écosystème qui grandit. Pas pour la spéculation — pour une utilité réelle.',
+    token_btn: 'Voir sur Polygonscan →',
+    tok1: 'Communauté / Gagner', tok2: 'Écosystème / Jeu', tok3: 'Prévente (ICO)', tok4: 'Équipe / Réserve', tok5: 'Aucun ✓',
+    game_label: 'Le Jeu', game_title: 'Ce qui arrive\nquand nous agissons\n<em style="font-style:italic;color:#4ecb82">mal</em>',
+    game_sub: 'SilentFlora — le jeu — montre ce qui est en jeu. Pas comme une leçon. Comme une expérience.',
+    game_btn: 'Jeu bientôt disponible →',
+    manifesto_quote: '"Je ne suis pas un idéaliste. Mais je vois comment nous détruisons tout avec les mauvaises incitations."',
+    cta_title: 'Prêt pour l\'<em>Écosystème?</em>', cta_sub: 'SFLR est live sur Polygon. Rejoignez la première communauté.',
+    cta_btn1: 'Voir le Token', cta_btn2: 'En savoir plus →', footer_wp: 'Livre Blanc'
+  },
+  es: {
+    nav_ecosystem: 'Ecosistema', nav_token: 'Token', nav_game: 'Juego', nav_manifesto: 'Manifiesto', nav_cta: 'Obtener SFLR',
+    hero_eyebrow: 'Ecosistema IA Descentralizado — Red Polygon',
+    hero_sub: 'Sin minería. Sin energía desperdiciada. La acción real es recompensada — jugando, creando y generando impacto. Esta es la nueva economía.',
+    hero_btn1: 'Descubrir Token', hero_btn2: 'El Juego →',
+    stat1: 'Suministro Total', stat2: 'Minería Requerida', stat3: 'Métodos de Ganancia', stat4: 'Tarifa Ecosistema',
+    pillars_label: 'Los Tres Pilares', pillars_title: 'Cómo\n<em style="font-style:italic;color:#4ecb82">ganas</em>',
+    pillars_sub: 'SFLR no se mina — se gana. A través de tres formas fundamentales de actuar.',
+    pillar1_text: 'Juega, contribuye, da forma a la comunidad. SilentFlora recompensa el tiempo de juego real y las contribuciones creativas.',
+    pillar2_text: 'Arte, música, historias, mods. La comunidad vota — el buen contenido es recompensado con SFLR.',
+    pillar3_text: 'Acciones reales más allá de la pantalla. Contribuciones positivas verificadas al mundo — recompensadas en SFLR.',
+    eco_label: 'El Ecosistema', eco_title: 'Más que\nun token',
+    eco1_title: 'Servicios IA pagaderos en SFLR, BTC, ETH', eco1_text: 'Texto, imagen, video, código — todos los servicios IA aceptan múltiples monedas. Los titulares SFLR obtienen ventajas.',
+    eco2_title: 'Tu agente IA personal', eco2_text: 'Se conecta a todo. Hace lo que le dices. El primer asistente doméstico verdaderamente descentralizado.',
+    eco3_title: 'La comunidad decide', eco3_text: 'Los titulares SFLR votan. Nuevas funciones, asociaciones, lanzamientos de tokens — verdadera democracia descentralizada.',
+    eco4_title: 'Paga con lo que quieras', eco4_text: 'BTC, ETH, BNB, SFLR — el ecosistema acepta todo. SFLR es la moneda de la casa con beneficios adicionales.',
+    token_label: 'El Token', token_sub: 'Diseñado para un ecosistema que crece. No para especulación — para utilidad real.',
+    token_btn: 'Ver en Polygonscan →',
+    tok1: 'Comunidad / Ganar', tok2: 'Ecosistema / Juego', tok3: 'Preventa (ICO)', tok4: 'Equipo / Reserva', tok5: 'Ninguno ✓',
+    game_label: 'El Juego', game_title: 'Qué pasa\ncuando actuamos\n<em style="font-style:italic;color:#4ecb82">mal</em>',
+    game_sub: 'SilentFlora — el juego — muestra lo que está en juego. No como una lección. Como una experiencia.',
+    game_btn: 'Juego próximamente →',
+    manifesto_quote: '"No soy un idealista. Pero veo cómo lo estamos destruyendo todo con los incentivos equivocados."',
+    cta_title: '¿Listo para el\n<em>Ecosistema?</em>', cta_sub: 'SFLR está live en Polygon. Únete a la primera comunidad.',
+    cta_btn1: 'Ver Token', cta_btn2: 'Saber más →', footer_wp: 'Libro Blanco'
+  },
+  zh: {
+    nav_ecosystem: '生态系统', nav_token: '代币', nav_game: '游戏', nav_manifesto: '宣言', nav_cta: '获取 SFLR',
+    hero_eyebrow: '去中心化 AI 生态系统 — Polygon 网络',
+    hero_sub: '无需挖矿。无需浪费能源。真实行动将获得奖励 — 通过游戏、创作和产生影响。这是新经济。',
+    hero_btn1: '发现代币', hero_btn2: '游戏 →',
+    stat1: '总供应量', stat2: '需要挖矿', stat3: '赚取方式', stat4: '生态系统费用',
+    pillars_label: '三大支柱', pillars_title: '如何\n<em style="font-style:italic;color:#4ecb82">赚取</em>',
+    pillars_sub: 'SFLR 不是挖矿得来的 — 而是赚取的。通过三种基本行动方式。',
+    pillar1_text: '游戏、贡献、塑造社区。SilentFlora 奖励真实游戏时间和创意贡献。',
+    pillar2_text: '艺术、音乐、故事、模组。社区投票 — 好内容将获得 SFLR 奖励。',
+    pillar3_text: '屏幕之外的真实行动。经过验证的对世界的积极贡献 — 以 SFLR 奖励。',
+    eco_label: '生态系统', eco_title: '不仅仅是\n一个代币',
+    eco1_title: 'AI 服务可用 SFLR、BTC、ETH 支付', eco1_text: '文本、图像、视频、代码 — 所有 AI 服务接受多种货币。SFLR 持有者获得优势。',
+    eco2_title: '您的个人 AI 助手', eco2_text: '连接一切。执行您的指令。第一个真正去中心化的家庭助手 — 由 SFLR 驱动。',
+    eco3_title: '社区决定', eco3_text: 'SFLR 持有者投票。新功能、合作伙伴关系、代币发行 — 真正的去中心化民主。',
+    eco4_title: '用您想要的方式支付', eco4_text: 'BTC、ETH、BNB、SFLR — 生态系统接受一切。SFLR 是具有额外好处的主要货币。',
+    token_label: '代币', token_sub: '为不断成长的生态系统而设计。不是为了投机 — 而是为了真正的效用。',
+    token_btn: '在 Polygonscan 查看 →',
+    tok1: '社区 / 赚取', tok2: '生态系统 / 游戏', tok3: '预售 (ICO)', tok4: '团队 / 储备', tok5: '无 ✓',
+    game_label: '游戏', game_title: '当我们\n<em style="font-style:italic;color:#4ecb82">错误</em>\n行事时会发生什么',
+    game_sub: 'SilentFlora — 游戏 — 展示了什么处于危险之中。不是作为说教。而是作为一种体验。',
+    game_btn: '游戏即将推出 →',
+    manifesto_quote: '"我不是一个理想主义者。但我看到我们如何用错误的激励机制摧毁一切。"',
+    cta_title: '准备好迎接\n<em>生态系统</em>了吗？', cta_sub: 'SFLR 在 Polygon 上线。成为第一个社区的一部分。',
+    cta_btn1: '查看代币', cta_btn2: '了解更多 →', footer_wp: '白皮书'
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+  if (!t) return;
+
+  // Update all elements with data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) {
+      el.innerHTML = t[key].replace(/\n/g, '<br>');
+    }
+  });
+
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === lang ||
+      (lang === 'zh' && btn.textContent === '中文'));
+  });
+
+  // Update html lang
+  document.documentElement.lang = lang;
+}
+
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0, my=0, rx=0, ry=0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx-4+'px';
+  cursor.style.top = my-4+'px';
+});
+
+function animRing() {
+  rx += (mx-rx-16)*0.12;
+  ry += (my-ry-16)*0.12;
+  ring.style.left = rx+'px';
+  ring.style.top = ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform='scale(3)'; ring.style.opacity='0'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform='scale(1)'; ring.style.opacity='1'; });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
