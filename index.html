@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SilentFlora — The Living Ecosystem</title>
+<title>SilentFlora — The Living Game</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -17,7 +18,6 @@
     --green-light: #4ecb82;
     --green-glow: rgba(45,158,95,0.15);
     --amber: #c8922a;
-    --blue-earth: #1a4a8a;
     --text: #e8e4d9;
     --text-muted: #7a7870;
     --text-dim: #3a3832;
@@ -36,14 +36,12 @@
     cursor: none;
   }
 
-  /* Cursor */
   .cursor { position:fixed; width:8px; height:8px; background:var(--green-light); border-radius:50%; pointer-events:none; z-index:9999; transition:transform 0.1s; mix-blend-mode:screen; }
   .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(78,203,130,0.4); border-radius:50%; pointer-events:none; z-index:9998; transition:all 0.15s; }
 
-  /* Noise */
   body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
 
-  /* LANGUAGE SWITCHER */
+  /* LANGUAGE BAR */
   .lang-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -57,21 +55,9 @@
     backdrop-filter: blur(8px);
   }
 
-  .lang-btn {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    background: transparent;
-    border: 1px solid transparent;
-    padding: 4px 10px;
-    cursor: none;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-
-  .lang-btn:hover { color: var(--green-light); border-color: var(--border-green); }
-  .lang-btn.active { color: var(--green-light); border-color: var(--border-green); background: var(--green-glow); }
+  .lang-btn { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--text-muted); background:transparent; border:1px solid transparent; padding:4px 10px; cursor:none; text-transform:uppercase; transition:all 0.2s; }
+  .lang-btn:hover { color:var(--green-light); border-color:var(--border-green); }
+  .lang-btn.active { color:var(--green-light); border-color:var(--border-green); background:var(--green-glow); }
 
   /* NAV */
   nav {
@@ -127,111 +113,19 @@
   .btn-secondary:hover { color:var(--green-light); }
 
   /* EARTH TOKEN */
-  .token-badge {
-    position: absolute;
-    right: 48px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    opacity: 0;
-    animation: fadeIn 1.5s ease 1.5s forwards;
-  }
-
-  .token-ring-outer {
-    width: 300px; height: 300px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Outer spinning ring */
-  .ring-orbit {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1px solid var(--border-green);
-    animation: spin 20s linear infinite;
-  }
-
-  .ring-orbit::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, transparent 0%, var(--green) 8%, transparent 16%);
-    animation: spin 3s linear infinite;
-    -webkit-mask: radial-gradient(circle at center, transparent 48%, black 49%);
-  }
-
-  /* Dots on orbit */
-  .orbit-dot {
-    position: absolute;
-    width: 6px; height: 6px;
-    background: var(--green-light);
-    border-radius: 50%;
-    top: -3px;
-    left: calc(50% - 3px);
-    transform-origin: 3px 153px;
-    box-shadow: 0 0 8px var(--green-light);
-  }
-
-  .orbit-dot:nth-child(2) { animation: spin 20s linear infinite; }
-  .orbit-dot:nth-child(3) { animation: spin 20s linear infinite; animation-delay: -6.6s; }
-  .orbit-dot:nth-child(4) { animation: spin 20s linear infinite; animation-delay: -13.3s; }
-
-  /* Inner ring */
-  .ring-inner {
-    width: 220px; height: 220px;
-    border-radius: 50%;
-    border: 1px solid rgba(78,203,130,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    animation: spinReverse 40s linear infinite;
-  }
-
-  /* Earth SVG center */
-  .earth-center {
-    width: 160px; height: 160px;
-    border-radius: 50%;
-    overflow: hidden;
-    position: relative;
-    box-shadow:
-      0 0 40px rgba(45,158,95,0.3),
-      0 0 80px rgba(45,158,95,0.1),
-      inset 0 0 20px rgba(0,0,0,0.5);
-    animation: spinEarth 60s linear infinite;
-  }
-
-  .earth-svg {
-    width: 100%; height: 100%;
-  }
-
-  .token-label {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .token-label-sym {
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    color: var(--green-light);
-    letter-spacing: 0.3em;
-  }
-
-  .token-label-net {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    color: var(--text-muted);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
+  .token-badge { position:absolute; right:48px; top:50%; transform:translateY(-50%); z-index:2; opacity:0; animation:fadeIn 1.5s ease 1.5s forwards; }
+  .token-ring-outer { width:300px; height:300px; position:relative; display:flex; align-items:center; justify-content:center; }
+  .ring-orbit { position:absolute; inset:0; border-radius:50%; border:1px solid var(--border-green); animation:spin 20s linear infinite; }
+  .ring-orbit::before { content:''; position:absolute; inset:-1px; border-radius:50%; background:conic-gradient(from 0deg, transparent 0%, var(--green) 8%, transparent 16%); animation:spin 3s linear infinite; -webkit-mask:radial-gradient(circle at center, transparent 48%, black 49%); }
+  .orbit-dot { position:absolute; width:6px; height:6px; background:var(--green-light); border-radius:50%; top:-3px; left:calc(50% - 3px); transform-origin:3px 153px; box-shadow:0 0 8px var(--green-light); }
+  .orbit-dot:nth-child(2) { animation:spin 20s linear infinite; }
+  .orbit-dot:nth-child(3) { animation:spin 20s linear infinite; animation-delay:-6.6s; }
+  .orbit-dot:nth-child(4) { animation:spin 20s linear infinite; animation-delay:-13.3s; }
+  .ring-inner { width:220px; height:220px; border-radius:50%; border:1px solid rgba(78,203,130,0.15); display:flex; align-items:center; justify-content:center; position:relative; animation:spinReverse 40s linear infinite; }
+  #earth-canvas { width:160px !important; height:160px !important; border-radius:50%; box-shadow:0 0 40px rgba(45,158,95,0.3), 0 0 80px rgba(45,158,95,0.1); }
+  .token-label { position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); text-align:center; white-space:nowrap; }
+  .token-label-sym { font-family:'Space Mono',monospace; font-size:14px; color:var(--green-light); letter-spacing:0.3em; }
+  .token-label-net { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-muted); letter-spacing:0.2em; text-transform:uppercase; }
 
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
   @keyframes spinReverse { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
@@ -265,17 +159,17 @@
   .pillar-title em { font-style:italic; color:var(--green-light); }
   .pillar-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
 
-  /* ECO */
-  .ecosystem { background:var(--black); }
-  .ecosystem-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:64px; }
-  .eco-card { background:var(--card); border:1px solid var(--border); padding:40px; position:relative; overflow:hidden; transition:border-color 0.3s; }
-  .eco-card:hover { border-color:var(--border-green); }
-  .eco-card::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(to right, transparent, var(--green), transparent); opacity:0; transition:opacity 0.4s; }
-  .eco-card:hover::after { opacity:1; }
-  .eco-tag { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
-  .eco-tag::before { content:''; width:20px; height:1px; background:var(--green); }
-  .eco-title { font-size:28px; font-weight:300; margin-bottom:16px; line-height:1.2; }
-  .eco-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
+  /* LEARNING */
+  .learning { background:var(--black); }
+  .learning-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:64px; }
+  .learn-card { background:var(--card); border:1px solid var(--border); padding:40px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .learn-card:hover { border-color:var(--border-green); }
+  .learn-card::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(to right, transparent, var(--green), transparent); opacity:0; transition:opacity 0.4s; }
+  .learn-card:hover::after { opacity:1; }
+  .learn-tag { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .learn-tag::before { content:''; width:20px; height:1px; background:var(--green); }
+  .learn-title { font-size:26px; font-weight:300; margin-bottom:16px; line-height:1.2; }
+  .learn-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
 
   /* TOKEN SECTION */
   .token-section { background:var(--deep); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -305,6 +199,12 @@
   .game-corner.tr { top:-1px; right:-1px; border-width:2px 2px 0 0; }
   .game-corner.bl { bottom:-1px; left:-1px; border-width:0 0 2px 2px; }
   .game-corner.br { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+
+  /* NOTICE */
+  .notice-bar { background:rgba(45,158,95,0.06); border-top:1px solid var(--border-green); border-bottom:1px solid var(--border-green); padding:20px 48px; text-align:center; }
+  .notice-bar p { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--text-muted); line-height:1.7; }
+  .notice-bar a { color:var(--green); text-decoration:none; }
+  .notice-bar a:hover { color:var(--green-light); }
 
   /* MANIFESTO */
   .manifesto { background:var(--green-dark); border-top:1px solid var(--border-green); border-bottom:1px solid var(--border-green); text-align:center; padding:120px 48px; }
@@ -344,8 +244,9 @@
     .token-badge { display:none; }
     .stats-bar { grid-template-columns:repeat(2,1fr); padding:24px; }
     section { padding:80px 24px; }
-    .pillars-grid,.ecosystem-grid,.token-grid,.game-inner { grid-template-columns:1fr; }
+    .pillars-grid,.learning-grid,.token-grid,.game-inner { grid-template-columns:1fr; }
     footer { flex-direction:column; gap:20px; text-align:center; }
+    .notice-bar { padding:16px 24px; }
   }
 </style>
 </head>
@@ -361,18 +262,19 @@
   <button class="lang-btn" onclick="setLang('fr')">FR</button>
   <button class="lang-btn" onclick="setLang('es')">ES</button>
   <button class="lang-btn" onclick="setLang('zh')">中文</button>
+  <button class="lang-btn" onclick="setLang('ko')">한국어</button>
 </div>
 
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
   <ul class="nav-links">
-    <li><a href="#ecosystem" data-i18n="nav_ecosystem">Ecosystem</a></li>
-    <li><a href="#token" data-i18n="nav_token">Token</a></li>
     <li><a href="#game" data-i18n="nav_game">Game</a></li>
+    <li><a href="#learn" data-i18n="nav_learn">Learn</a></li>
+    <li><a href="#token" data-i18n="nav_token">Token</a></li>
     <li><a href="#manifesto" data-i18n="nav_manifesto">Manifesto</a></li>
   </ul>
-  <a href="#token" class="nav-cta" data-i18n="nav_cta">Get SFLR</a>
+  <a href="#learn" class="nav-cta" data-i18n="nav_cta">Explore</a>
 </nav>
 
 <!-- HERO -->
@@ -383,17 +285,17 @@
   <div class="orb orb-3"></div>
 
   <div class="hero-content">
-    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Decentralized AI Ecosystem — Polygon Network</p>
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Narrative Game — Blockchain — Polygon Network</p>
     <h1 class="hero-title">Silent<em>Flora</em></h1>
-    <h2 class="hero-title-2">Ecosystem</h2>
-    <p class="hero-sub" data-i18n="hero_sub">No mining. No wasted energy. Real action is rewarded — through playing, creating and making an impact. This is the new economy.</p>
+    <h2 class="hero-title-2" data-i18n="hero_title2">The Game</h2>
+    <p class="hero-sub" data-i18n="hero_sub">A quiet forest. Every decision changes the world. Experience blockchain without knowing it — through play, reflection and consequence.</p>
     <div class="hero-actions">
-      <a href="#token" class="btn-primary" data-i18n="hero_btn1">Discover Token</a>
-      <a href="#game" class="btn-secondary" data-i18n="hero_btn2">The Game →</a>
+      <a href="#game" class="btn-primary" data-i18n="hero_btn1">Discover the Game</a>
+      <a href="#learn" class="btn-secondary" data-i18n="hero_btn2">How it works →</a>
     </div>
   </div>
 
-  <!-- EARTH TOKEN BADGE -->
+  <!-- EARTH BADGE -->
   <div class="token-badge">
     <div class="token-ring-outer">
       <div class="ring-orbit">
@@ -402,64 +304,7 @@
         <div class="orbit-dot"></div>
       </div>
       <div class="ring-inner">
-        <div class="earth-center">
-          <!-- Earth SVG - animated planet -->
-          <svg class="earth-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <clipPath id="earthClip">
-                <circle cx="80" cy="80" r="78"/>
-              </clipPath>
-              <radialGradient id="earthLight" cx="35%" cy="35%" r="60%">
-                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
-                <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
-              </radialGradient>
-              <radialGradient id="atmosphereGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="80%" stop-color="transparent"/>
-                <stop offset="100%" stop-color="rgba(78,203,130,0.2)"/>
-              </radialGradient>
-            </defs>
-
-            <!-- Ocean base -->
-            <circle cx="80" cy="80" r="78" fill="#0d2b4a" clip-path="url(#earthClip)"/>
-
-            <!-- Continents / land masses -->
-            <g clip-path="url(#earthClip)">
-              <!-- Ocean deep -->
-              <rect x="0" y="0" width="160" height="160" fill="#0d2b4a"/>
-              <!-- Ocean mid -->
-              <ellipse cx="80" cy="80" rx="78" ry="78" fill="#0f3a5e"/>
-
-              <!-- Europe/Africa -->
-              <path d="M75 20 Q85 18 90 28 Q95 35 88 45 Q95 50 92 60 Q98 70 95 85 Q100 95 92 105 Q88 115 80 120 Q72 125 68 115 Q60 110 62 98 Q55 88 58 75 Q52 65 56 52 Q58 40 65 30 Z" fill="#2d7a3a" opacity="0.9"/>
-
-              <!-- Americas -->
-              <path d="M25 30 Q35 25 42 35 Q48 45 44 58 Q50 68 46 80 Q52 92 48 105 Q42 118 35 122 Q28 125 22 115 Q15 105 18 92 Q12 80 15 68 Q10 55 15 42 Q18 33 25 30 Z" fill="#2d7a3a" opacity="0.85"/>
-
-              <!-- Asia/Russia -->
-              <path d="M95 15 Q115 12 130 20 Q145 28 148 42 Q152 55 145 65 Q150 75 144 85 Q140 95 128 98 Q115 100 105 92 Q95 88 92 78 Q86 68 90 56 Q88 44 92 32 Z" fill="#2d7a3a" opacity="0.9"/>
-
-              <!-- Australia -->
-              <path d="M118 105 Q128 102 135 110 Q140 118 135 128 Q128 135 118 132 Q110 128 108 118 Q108 108 118 105 Z" fill="#3d8a46" opacity="0.8"/>
-
-              <!-- Ice caps -->
-              <ellipse cx="80" cy="5" rx="50" ry="10" fill="rgba(220,240,255,0.4)"/>
-              <ellipse cx="80" cy="155" rx="45" ry="10" fill="rgba(220,240,255,0.35)"/>
-
-              <!-- Cloud layers -->
-              <ellipse cx="60" cy="45" rx="25" ry="8" fill="rgba(255,255,255,0.12)" transform="rotate(-15,60,45)"/>
-              <ellipse cx="110" cy="70" rx="20" ry="6" fill="rgba(255,255,255,0.1)" transform="rotate(10,110,70)"/>
-              <ellipse cx="40" cy="90" rx="18" ry="5" fill="rgba(255,255,255,0.08)"/>
-              <ellipse cx="95" cy="110" rx="22" ry="6" fill="rgba(255,255,255,0.1)" transform="rotate(-8,95,110)"/>
-
-              <!-- Light overlay -->
-              <circle cx="80" cy="80" r="78" fill="url(#earthLight)"/>
-            </g>
-
-            <!-- Atmosphere glow -->
-            <circle cx="80" cy="80" r="78" fill="none" stroke="rgba(78,203,130,0.3)" stroke-width="4"/>
-            <circle cx="80" cy="80" r="80" fill="url(#atmosphereGrad)"/>
-          </svg>
-        </div>
+        <canvas id="earth-canvas"></canvas>
       </div>
     </div>
     <div class="token-label">
@@ -474,64 +319,65 @@
   <div class="stat"><div class="stat-value">100<span>M</span></div><div class="stat-label" data-i18n="stat1">Total Supply</div></div>
   <div class="stat"><div class="stat-value">0<span>%</span></div><div class="stat-label" data-i18n="stat2">Mining Required</div></div>
   <div class="stat"><div class="stat-value">3</div><div class="stat-label" data-i18n="stat3">Earn Methods</div></div>
-  <div class="stat"><div class="stat-value">1<span>%</span></div><div class="stat-label" data-i18n="stat4">Ecosystem Fee</div></div>
+  <div class="stat"><div class="stat-value">5</div><div class="stat-label" data-i18n="stat4">Learning Levels</div></div>
 </div>
 
-<!-- PILLARS -->
+<!-- PILLARS / HOW YOU PARTICIPATE -->
 <section class="pillars" id="ecosystem">
   <div class="reveal">
-    <p class="section-label" data-i18n="pillars_label">The Three Pillars</p>
-    <h2 class="section-title" data-i18n="pillars_title">How you<br><em style="font-style:italic;color:#4ecb82">earn</em></h2>
-    <p class="section-sub" data-i18n="pillars_sub">SFLR is not mined — it is earned. Through three fundamental ways of acting.</p>
+    <p class="section-label" data-i18n="pillars_label">How it works</p>
+    <h2 class="section-title" data-i18n="pillars_title">Three ways to<br><em style="font-style:italic;color:#4ecb82">participate</em></h2>
+    <p class="section-sub" data-i18n="pillars_sub">SFLR is not bought — it is earned through genuine participation in the Silent Flora world.</p>
   </div>
   <div class="pillars-grid reveal">
     <div class="pillar">
       <div class="pillar-number">01 —</div>
       <div class="pillar-icon">🎮</div>
       <h3 class="pillar-title">Proof of <em>Play</em></h3>
-      <p class="pillar-text" data-i18n="pillar1_text">Play, contribute, shape the community. SilentFlora rewards genuine playtime and creative contributions to the game ecosystem.</p>
+      <p class="pillar-text" data-i18n="pillar1_text">Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions to the Silent Flora ecosystem.</p>
     </div>
     <div class="pillar">
       <div class="pillar-number">02 —</div>
-      <div class="pillar-icon">🧠</div>
+      <div class="pillar-icon">🎨</div>
       <h3 class="pillar-title">Proof of <em>Creativity</em></h3>
-      <p class="pillar-text" data-i18n="pillar2_text">Art, music, stories, mods. The community votes — good content is rewarded with SFLR. AI validates quality.</p>
+      <p class="pillar-text" data-i18n="pillar2_text">Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised with SFLR.</p>
     </div>
     <div class="pillar">
       <div class="pillar-number">03 —</div>
-      <div class="pillar-icon">🌍</div>
+      <div class="pillar-icon">🌱</div>
       <h3 class="pillar-title">Proof of <em>Impact</em></h3>
-      <p class="pillar-text" data-i18n="pillar3_text">Real actions beyond the screen. Verified positive contributions to the world — rewarded in SFLR.</p>
+      <p class="pillar-text" data-i18n="pillar3_text">Testing, feedback, sharing. Those who help build the Silent Flora community contribute to something larger than the game itself.</p>
     </div>
   </div>
 </section>
 
-<!-- ECOSYSTEM -->
-<section class="ecosystem">
+<!-- LEARNING JOURNEY -->
+<section class="learning" id="learn">
   <div class="reveal">
-    <p class="section-label" data-i18n="eco_label">The Ecosystem</p>
-    <h2 class="section-title" data-i18n="eco_title">More than<br>a token</h2>
+    <p class="section-label" data-i18n="learn_label">The Learning Journey</p>
+    <h2 class="section-title" data-i18n="learn_title">Blockchain —<br><em style="font-style:italic;color:#4ecb82">experienced</em></h2>
+    <p class="section-sub" data-i18n="learn_sub">Five levels. Five concepts. No tutorials. You understand blockchain by living it — not by studying it.</p>
   </div>
-  <div class="ecosystem-grid reveal">
-    <div class="eco-card">
-      <div class="eco-tag">AI Platform</div>
-      <h3 class="eco-title" data-i18n="eco1_title">AI services payable in SFLR, BTC, ETH</h3>
-      <p class="eco-text" data-i18n="eco1_text">Text, image, video, code, documentation — all AI services in the ecosystem accept multiple currencies. SFLR holders get advantages.</p>
+  <div class="learning-grid reveal">
+    <div class="learn-card">
+      <div class="learn-tag" data-i18n="learn1_tag">Level 1 — Identity</div>
+      <h3 class="learn-title" data-i18n="learn1_title">Enter a name. Start playing.</h3>
+      <p class="learn-text" data-i18n="learn1_text">Play begins immediately — no wallet needed to start. Players who want to connect their own wallet can do so at any time. Silent Flora never holds or manages private keys. Your wallet remains fully under your control.</p>
     </div>
-    <div class="eco-card">
-      <div class="eco-tag">SFLR Home</div>
-      <h3 class="eco-title" data-i18n="eco2_title">Your personal AI agent</h3>
-      <p class="eco-text" data-i18n="eco2_text">Connects to everything. Does what you tell it. The first truly decentralized home assistant — powered by SFLR.</p>
+    <div class="learn-card">
+      <div class="learn-tag" data-i18n="learn2_tag">Level 2 — Value</div>
+      <h3 class="learn-title" data-i18n="learn2_title">Decisions earn rewards.</h3>
+      <p class="learn-text" data-i18n="learn2_text">SFLR is earned through gameplay. Value is created by action — not by purchase. The token represents what you have done, not what you have spent.</p>
     </div>
-    <div class="eco-card">
-      <div class="eco-tag">Governance</div>
-      <h3 class="eco-title" data-i18n="eco3_title">The community decides</h3>
-      <p class="eco-text" data-i18n="eco3_text">SFLR holders vote. New features, partnerships, token releases — real decentralized democracy in the ecosystem.</p>
+    <div class="learn-card">
+      <div class="learn-tag" data-i18n="learn3_tag">Level 3 — Exchange</div>
+      <h3 class="learn-title" data-i18n="learn3_title">Use tokens within the world.</h3>
+      <p class="learn-text" data-i18n="learn3_text">Tokens open new areas and can be shared with other players. Peer-to-peer exchange becomes natural before it becomes conceptual.</p>
     </div>
-    <div class="eco-card">
-      <div class="eco-tag">Multi-Chain</div>
-      <h3 class="eco-title" data-i18n="eco4_title">Pay with what you want</h3>
-      <p class="eco-text" data-i18n="eco4_text">BTC, ETH, BNB, SFLR — the ecosystem accepts everything. SFLR is the house currency with extra benefits, never mandatory.</p>
+    <div class="learn-card">
+      <div class="learn-tag" data-i18n="learn4_tag">Level 4 — Community</div>
+      <h3 class="learn-title" data-i18n="learn4_title">Your voice shapes the world.</h3>
+      <p class="learn-text" data-i18n="learn4_text">Players give feedback on what happens next. Community participation is experienced as real contribution — not as a technical concept.</p>
     </div>
   </div>
 </section>
@@ -541,8 +387,8 @@
   <div class="token-grid">
     <div class="token-info reveal">
       <p class="section-label" data-i18n="token_label">The Token</p>
-      <h2>SFLR —<br>the <em>silent</em><br>currency</h2>
-      <p data-i18n="token_sub">Designed for an ecosystem that grows. Not for speculation — for real utility. Every transaction strengthens the system.</p>
+      <h2><em>SFLR</em></h2>
+      <p data-i18n="token_sub">SFLR is the in-game utility token of Silent Flora. It is earned through play and used within the game world. It is not a financial instrument and does not represent ownership in any entity.</p>
       <div class="token-address">
         <span>Contract Address — Polygon Mainnet</span>
         0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E
@@ -554,24 +400,29 @@
     <div class="reveal">
       <div class="tokenomics">
         <div class="trow"><span class="trow-label">Total Supply</span><span class="trow-value green">100,000,000 SFLR</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok1">Community / Earn</span><span class="trow-value">40%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok2">Ecosystem / Game</span><span class="trow-value">25%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok3">Pre-Sale (ICO)</span><span class="trow-value">20%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok4">Team / Reserve</span><span class="trow-value">15%</span></div>
-        <div class="trow"><span class="trow-label">Blockchain</span><span class="trow-value green">Polygon</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok1">Player Rewards</span><span class="trow-value">40%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok2">Game Ecosystem</span><span class="trow-value">25%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok3">Early Community Access</span><span class="trow-value">20%</span></div>
+        <div class="trow"><span class="trow-label" data-i18n="tok4">Development / Reserve</span><span class="trow-value">15%</span></div>
+        <div class="trow"><span class="trow-label">Network</span><span class="trow-value green">Polygon</span></div>
         <div class="trow"><span class="trow-label">Mining</span><span class="trow-value" data-i18n="tok5">None ✓</span></div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- LEGAL NOTICE BAR -->
+<div class="notice-bar">
+  <p data-i18n="notice_text">SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes. <a href="SilentFlora_Projektuebersicht_SAFE_DE.html" data-i18n="notice_link_de">Projektübersicht (DE)</a> · <a href="SilentFlora_ProjectOverview_SAFE_EN.html" data-i18n="notice_link_en">Project Overview (EN)</a></p>
+</div>
+
 <!-- GAME -->
 <section class="game-section" id="game">
   <div class="game-inner">
     <div class="reveal">
       <p class="section-label" data-i18n="game_label">The Game</p>
-      <h2 class="section-title" data-i18n="game_title">What happens<br>when we act<br><em style="font-style:italic;color:#4ecb82">wrongly</em></h2>
-      <p class="section-sub" data-i18n="game_sub">SilentFlora — the game — shows what is at stake. Not as a lecture. As an experience. The ecosystem rewards those who understand the lesson.</p>
+      <h2 class="section-title" data-i18n="game_title">What happens<br>when we act<br><em style="font-style:italic;color:#4ecb82">without thinking</em></h2>
+      <p class="section-sub" data-i18n="game_sub">Silent Flora shows what is at stake — not as a lecture, but as an experience. A quiet forest. A wandering figure. Every decision leaves a mark.</p>
       <div class="hero-actions">
         <a href="#" class="btn-secondary" data-i18n="game_btn">Game coming soon →</a>
       </div>
@@ -591,163 +442,272 @@
 
 <!-- MANIFESTO -->
 <section class="manifesto" id="manifesto">
-  <blockquote class="manifesto-quote reveal" data-i18n="manifesto_quote">"I am not a do-gooder. But I see how we are destroying everything with the wrong incentives."</blockquote>
-  <p class="manifesto-attr reveal">— @Silentflora, Founder</p>
+  <blockquote class="manifesto-quote reveal" data-i18n="manifesto_quote">"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."</blockquote>
+  <p class="manifesto-attr reveal">— Silent Flora, 2026</p>
 </section>
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2 class="reveal" data-i18n="cta_title">Ready for the<br><em>Ecosystem?</em></h2>
-  <p class="reveal" data-i18n="cta_sub">SFLR is live on Polygon. Become part of the first community.</p>
+  <h2 class="reveal" data-i18n="cta_title">Ready to<br><em>explore?</em></h2>
+  <p class="reveal" data-i18n="cta_sub">Silent Flora is in development. Follow the journey and be part of the community from the beginning.</p>
   <div class="cta-actions reveal">
     <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="btn-primary" data-i18n="cta_btn1">View Token</a>
-    <a href="#ecosystem" class="btn-secondary" data-i18n="cta_btn2">Learn more →</a>
+    <a href="#game" class="btn-secondary" data-i18n="cta_btn2">The Game →</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
-  <div class="footer-text">SFLR — Polygon Mainnet — 2025</div>
+  <div class="footer-text">SFLR — Polygon Mainnet — 2026</div>
   <div class="footer-links">
     <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank">Polygonscan</a>
-    <a href="#" data-i18n="footer_wp">Whitepaper</a>
-    <a href="#">Discord</a>
+    <a href="SilentFlora_ProjectOverview_SAFE_EN.html" data-i18n="footer_overview">Project Overview</a>
+    <a href="https://x.com/SilentFlora_io" target="_blank">X / Twitter</a>
   </div>
 </footer>
 
 <script>
-// ============ TRANSLATIONS ============
 const i18n = {
   en: {
-    nav_ecosystem: 'Ecosystem', nav_token: 'Token', nav_game: 'Game', nav_manifesto: 'Manifesto', nav_cta: 'Get SFLR',
-    hero_eyebrow: 'Decentralized AI Ecosystem — Polygon Network',
-    hero_sub: 'No mining. No wasted energy. Real action is rewarded — through playing, creating and making an impact. This is the new economy.',
-    hero_btn1: 'Discover Token', hero_btn2: 'The Game →',
-    stat1: 'Total Supply', stat2: 'Mining Required', stat3: 'Earn Methods', stat4: 'Ecosystem Fee',
-    pillars_label: 'The Three Pillars', pillars_title: 'How you\n<em style="font-style:italic;color:#4ecb82">earn</em>',
-    pillars_sub: 'SFLR is not mined — it is earned. Through three fundamental ways of acting.',
-    pillar1_text: 'Play, contribute, shape the community. SilentFlora rewards genuine playtime and creative contributions to the game ecosystem.',
-    pillar2_text: 'Art, music, stories, mods. The community votes — good content is rewarded with SFLR. AI validates quality.',
-    pillar3_text: 'Real actions beyond the screen. Verified positive contributions to the world — rewarded in SFLR.',
-    eco_label: 'The Ecosystem', eco_title: 'More than\na token',
-    eco1_title: 'AI services payable in SFLR, BTC, ETH', eco1_text: 'Text, image, video, code, documentation — all AI services accept multiple currencies. SFLR holders get advantages.',
-    eco2_title: 'Your personal AI agent', eco2_text: 'Connects to everything. Does what you tell it. The first truly decentralized home assistant — powered by SFLR.',
-    eco3_title: 'The community decides', eco3_text: 'SFLR holders vote. New features, partnerships, token releases — real decentralized democracy.',
-    eco4_title: 'Pay with what you want', eco4_text: 'BTC, ETH, BNB, SFLR — the ecosystem accepts everything. SFLR is the house currency with extra benefits, never mandatory.',
-    token_label: 'The Token', token_sub: 'Designed for an ecosystem that grows. Not for speculation — for real utility. Every transaction strengthens the system.',
+    nav_game: 'Game', nav_learn: 'Learn', nav_token: 'Token', nav_manifesto: 'Manifesto', nav_cta: 'Explore',
+    hero_eyebrow: 'Narrative Game — Blockchain — Polygon Network',
+    hero_title2: 'The Game',
+    hero_sub: 'A quiet forest. Every decision changes the world. Experience blockchain without knowing it — through play, reflection and consequence.',
+    hero_btn1: 'Discover the Game', hero_btn2: 'How it works →',
+    stat1: 'Total Supply', stat2: 'Mining Required', stat3: 'Earn Methods', stat4: 'Learning Levels',
+    pillars_label: 'How it works',
+    pillars_title: 'Three ways to\n<em style="font-style:italic;color:#4ecb82">participate</em>',
+    pillars_sub: 'SFLR is not bought — it is earned through genuine participation in the Silent Flora world.',
+    pillar1_text: 'Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions to the Silent Flora ecosystem.',
+    pillar2_text: 'Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised with SFLR.',
+    pillar3_text: 'Testing, feedback, sharing. Those who help build the Silent Flora community contribute to something larger than the game itself.',
+    learn_label: 'The Learning Journey',
+    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">experienced</em>',
+    learn_sub: 'Five levels. Five concepts. No tutorials. You understand blockchain by living it — not by studying it.',
+    learn1_tag: 'Level 1 — Identity', learn1_title: 'Enter a name. Start playing.',
+    learn1_text: 'A wallet is created quietly in the background. The player discovers it when curiosity leads them there — not as a requirement, but as a feature of the world they already inhabit.',
+    learn2_tag: 'Level 2 — Value', learn2_title: 'Decisions earn rewards.',
+    learn2_text: 'SFLR is earned through gameplay. Value is created by action — not by purchase. The token represents what you have done, not what you have spent.',
+    learn3_tag: 'Level 3 — Exchange', learn3_title: 'Use tokens within the world.',
+    learn3_text: 'Tokens open new areas and can be shared with other players. Peer-to-peer exchange becomes natural before it becomes conceptual.',
+    learn4_tag: 'Level 4 — Community', learn4_title: 'Your voice shapes the world.',
+    learn4_text: 'Players give feedback on what happens next. Community participation is experienced as real contribution — not as a technical concept.',
+    token_label: 'The Token',
+    token_sub: 'SFLR is the in-game utility token of Silent Flora. It is earned through play and used within the game world. It is not a financial instrument and does not represent ownership in any entity.',
     token_btn: 'View on Polygonscan →',
-    tok1: 'Community / Earn', tok2: 'Ecosystem / Game', tok3: 'Pre-Sale (ICO)', tok4: 'Team / Reserve', tok5: 'None ✓',
-    game_label: 'The Game', game_title: 'What happens\nwhen we act\n<em style="font-style:italic;color:#4ecb82">wrongly</em>',
-    game_sub: 'SilentFlora — the game — shows what is at stake. Not as a lecture. As an experience. The ecosystem rewards those who understand the lesson.',
+    tok1: 'Player Rewards', tok2: 'Game Ecosystem', tok3: 'Early Community Access', tok4: 'Development / Reserve', tok5: 'None ✓',
+    notice_text: 'SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes.',
+    notice_link_de: 'Projektübersicht (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: 'The Game',
+    game_title: 'What happens\nwhen we act\n<em style="font-style:italic;color:#4ecb82">without thinking</em>',
+    game_sub: 'Silent Flora shows what is at stake — not as a lecture, but as an experience. A quiet forest. A wandering figure. Every decision leaves a mark.',
     game_btn: 'Game coming soon →',
-    manifesto_quote: '"I am not a do-gooder. But I see how we are destroying everything with the wrong incentives."',
-    cta_title: 'Ready for the\n<em>Ecosystem?</em>', cta_sub: 'SFLR is live on Polygon. Become part of the first community.',
-    cta_btn1: 'View Token', cta_btn2: 'Learn more →', footer_wp: 'Whitepaper'
+    manifesto_quote: '"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."',
+    cta_title: 'Ready to\n<em>explore?</em>',
+    cta_sub: 'Silent Flora is in development. Follow the journey and be part of the community from the beginning.',
+    cta_btn1: 'View Token', cta_btn2: 'The Game →',
+    footer_overview: 'Project Overview'
   },
   de: {
-    nav_ecosystem: 'Ökosystem', nav_token: 'Token', nav_game: 'Game', nav_manifesto: 'Manifest', nav_cta: 'SFLR holen',
-    hero_eyebrow: 'Dezentrales KI-Ökosystem — Polygon Netzwerk',
-    hero_sub: 'Kein Mining. Keine verschwendete Energie. Echtes Handeln wird belohnt — durch Spielen, Kreieren und Impact. Das ist die neue Ökonomie.',
-    hero_btn1: 'Token entdecken', hero_btn2: 'Das Game →',
-    stat1: 'Gesamtangebot', stat2: 'Mining nötig', stat3: 'Verdienst-Wege', stat4: 'Ökosystem-Gebühr',
-    pillars_label: 'Die drei Säulen', pillars_title: 'Wie du\n<em style="font-style:italic;color:#4ecb82">verdienst</em>',
-    pillars_sub: 'SFLR wird nicht geschürft — er wird verdient. Durch drei fundamentale Arten des Handelns.',
-    pillar1_text: 'Spielen, beitragen, die Community gestalten. SilentFlora belohnt echte Spielzeit und kreative Beiträge.',
-    pillar2_text: 'Kunst, Musik, Stories, Mods. Die Community bewertet — gute Inhalte werden mit SFLR vergütet.',
-    pillar3_text: 'Echte Handlungen ausserhalb des Screens. Verifizierte positive Beiträge zur Welt — belohnt in SFLR.',
-    eco_label: 'Das Ökosystem', eco_title: 'Mehr als\nein Token',
-    eco1_title: 'KI-Dienste zahlbar in SFLR, BTC, ETH', eco1_text: 'Text, Bild, Video, Code, Dokumentation — alle KI-Services akzeptieren verschiedene Währungen.',
-    eco2_title: 'Dein persönlicher KI-Agent', eco2_text: 'Verbindet sich mit allem. Steuert was du ihm sagst. Der erste wirklich dezentrale Heimassistent.',
-    eco3_title: 'Die Community entscheidet', eco3_text: 'SFLR-Halter stimmen ab. Neue Features, Partnerships, Token-Releases — echte dezentrale Demokratie.',
-    eco4_title: 'Zahle womit du willst', eco4_text: 'BTC, ETH, BNB, SFLR — das Ökosystem akzeptiert alles. SFLR ist die Hauswährung mit Vorteilen, kein Zwang.',
-    token_label: 'Der Token', token_sub: 'Designed für ein Ökosystem das wächst. Nicht für Spekulation — für echten Nutzen.',
+    nav_game: 'Game', nav_learn: 'Lernen', nav_token: 'Token', nav_manifesto: 'Manifest', nav_cta: 'Entdecken',
+    hero_eyebrow: 'Narratives Spiel — Blockchain — Polygon Netzwerk',
+    hero_title2: 'Das Spiel',
+    hero_sub: 'Ein stiller Wald. Jede Entscheidung verändert die Welt. Blockchain erleben ohne es zu wissen — durch Spielen, Nachdenken und Konsequenz.',
+    hero_btn1: 'Das Spiel entdecken', hero_btn2: 'Wie es funktioniert →',
+    stat1: 'Gesamtangebot', stat2: 'Mining nötig', stat3: 'Verdienst-Wege', stat4: 'Lernlevel',
+    pillars_label: 'Wie es funktioniert',
+    pillars_title: 'Drei Wege zur\n<em style="font-style:italic;color:#4ecb82">Teilnahme</em>',
+    pillars_sub: 'SFLR wird nicht gekauft — er wird durch echte Teilnahme in der Silent Flora Welt verdient.',
+    pillar1_text: 'Spiel das Spiel, trage zur Welt bei. SFLR wird durch echtes Gameplay und kreative Beiträge verdient.',
+    pillar2_text: 'Kunst, Musik, Geschichten, Ideen. Die Community gestaltet die Welt gemeinsam — bedeutsame Beiträge werden mit SFLR anerkannt.',
+    pillar3_text: 'Testen, Feedback geben, teilen. Wer hilft Silent Flora aufzubauen, trägt zu etwas Grösserem als dem Spiel bei.',
+    learn_label: 'Die Lernreise',
+    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">erlebt</em>',
+    learn_sub: 'Fünf Level. Fünf Konzepte. Keine Tutorials. Blockchain verstehen durch Erleben — nicht durch Studieren.',
+    learn1_tag: 'Level 1 — Identität', learn1_title: 'Namen eingeben. Spielen beginnen.',
+    learn1_text: 'Das Spiel beginnt sofort — kein Wallet nötig um anzufangen. Spieler die ihr eigenes Wallet verbinden möchten können das jederzeit tun. Silent Flora hält oder verwaltet keine privaten Schlüssel. Dein Wallet bleibt vollständig unter deiner Kontrolle.',
+    learn2_tag: 'Level 2 — Wert', learn2_title: 'Entscheidungen bringen Belohnungen.',
+    learn2_text: 'SFLR wird durch Gameplay verdient. Wert entsteht durch Handeln — nicht durch Kaufen. Der Token repräsentiert was du getan hast, nicht was du ausgegeben hast.',
+    learn3_tag: 'Level 3 — Austausch', learn3_title: 'Token in der Welt nutzen.',
+    learn3_text: 'Token öffnen neue Bereiche und können mit anderen Spielern geteilt werden. Peer-to-Peer Austausch wird natürlich bevor er konzeptuell wird.',
+    learn4_tag: 'Level 4 — Community', learn4_title: 'Deine Stimme gestaltet die Welt.',
+    learn4_text: 'Spieler geben Feedback was als nächstes passiert. Community-Teilnahme wird als echter Beitrag erlebt — nicht als technisches Konzept.',
+    token_label: 'Der Token',
+    token_sub: 'SFLR ist der In-Game Utility Token von Silent Flora. Er wird durch Spielen verdient und innerhalb der Spielwelt verwendet. Er ist kein Finanzinstrument und repräsentiert keine Eigentumsrechte.',
     token_btn: 'Auf Polygonscan ansehen →',
-    tok1: 'Community / Verdienen', tok2: 'Ökosystem / Game', tok3: 'Vorverkauf (ICO)', tok4: 'Team / Reserve', tok5: 'Keins ✓',
-    game_label: 'Das Game', game_title: 'Was passiert,\nwenn wir\n<em style="font-style:italic;color:#4ecb82">falsch</em> handeln',
-    game_sub: 'SilentFlora — das Game — zeigt was auf dem Spiel steht. Nicht als Predigt. Als Erfahrung.',
+    tok1: 'Spieler Belohnungen', tok2: 'Spiel Ökosystem', tok3: 'Früher Community-Zugang', tok4: 'Entwicklung / Reserve', tok5: 'Keins ✓',
+    notice_text: 'SFLR ist ein Utility Token für die Nutzung innerhalb des Silent Flora Spiels. Er ist kein Finanzinstrument, kein Wertpapier, und es wird keine finanzielle Rendite versprochen oder impliziert. Früher Community-Zugang ist für aktive Tester und Mitwirkende — nicht für Investitionszwecke.',
+    notice_link_de: 'Projektübersicht (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: 'Das Spiel',
+    game_title: 'Was passiert\nwenn wir\n<em style="font-style:italic;color:#4ecb82">ohne Nachdenken</em> handeln',
+    game_sub: 'Silent Flora zeigt was auf dem Spiel steht — nicht als Predigt, sondern als Erfahrung. Ein stiller Wald. Eine wandernde Figur. Jede Entscheidung hinterlässt eine Spur.',
     game_btn: 'Game coming soon →',
-    manifesto_quote: '"Ich bin kein Weltverbesserer – aber ich sehe, wie wir mit den falschen Anreizen alles zerstören."',
-    cta_title: 'Bereit für das\n<em>Ökosystem?</em>', cta_sub: 'SFLR ist live auf Polygon. Werde Teil der ersten Community.',
-    cta_btn1: 'Token ansehen', cta_btn2: 'Mehr erfahren →', footer_wp: 'Whitepaper'
+    manifesto_quote: '"Blockchain ist nicht für Spekulanten. Sie ist für alle. Silent Flora ist die Brücke."',
+    cta_title: 'Bereit zum\n<em>Entdecken?</em>',
+    cta_sub: 'Silent Flora ist in Entwicklung. Begleite die Reise und sei von Anfang an Teil der Community.',
+    cta_btn1: 'Token ansehen', cta_btn2: 'Das Spiel →',
+    footer_overview: 'Projektübersicht'
   },
   fr: {
-    nav_ecosystem: 'Écosystème', nav_token: 'Token', nav_game: 'Jeu', nav_manifesto: 'Manifeste', nav_cta: 'Obtenir SFLR',
-    hero_eyebrow: 'Écosystème IA Décentralisé — Réseau Polygon',
-    hero_sub: 'Pas de minage. Pas d\'énergie gaspillée. L\'action réelle est récompensée — par le jeu, la création et l\'impact. C\'est la nouvelle économie.',
-    hero_btn1: 'Découvrir le Token', hero_btn2: 'Le Jeu →',
-    stat1: 'Offre Totale', stat2: 'Minage Requis', stat3: 'Méthodes de Gain', stat4: 'Frais Écosystème',
-    pillars_label: 'Les Trois Piliers', pillars_title: 'Comment vous\n<em style="font-style:italic;color:#4ecb82">gagnez</em>',
-    pillars_sub: 'SFLR n\'est pas miné — il est gagné. À travers trois façons fondamentales d\'agir.',
-    pillar1_text: 'Jouez, contribuez, façonnez la communauté. SilentFlora récompense le temps de jeu réel et les contributions créatives.',
-    pillar2_text: 'Art, musique, histoires, mods. La communauté vote — le bon contenu est récompensé en SFLR.',
-    pillar3_text: 'Actions réelles au-delà de l\'écran. Contributions positives vérifiées au monde — récompensées en SFLR.',
-    eco_label: 'L\'Écosystème', eco_title: 'Plus qu\'un\ntoken',
-    eco1_title: 'Services IA payables en SFLR, BTC, ETH', eco1_text: 'Texte, image, vidéo, code — tous les services IA acceptent plusieurs devises. Les détenteurs SFLR obtiennent des avantages.',
-    eco2_title: 'Votre agent IA personnel', eco2_text: 'Se connecte à tout. Fait ce que vous lui dites. Le premier assistant domestique vraiment décentralisé.',
-    eco3_title: 'La communauté décide', eco3_text: 'Les détenteurs SFLR votent. Nouvelles fonctionnalités, partenariats, démos de tokens — vraie démocratie décentralisée.',
-    eco4_title: 'Payez avec ce que vous voulez', eco4_text: 'BTC, ETH, BNB, SFLR — l\'écosystème accepte tout. SFLR est la devise maison avec des avantages supplémentaires.',
-    token_label: 'Le Token', token_sub: 'Conçu pour un écosystème qui grandit. Pas pour la spéculation — pour une utilité réelle.',
+    nav_game: 'Jeu', nav_learn: 'Apprendre', nav_token: 'Token', nav_manifesto: 'Manifeste', nav_cta: 'Explorer',
+    hero_eyebrow: 'Jeu Narratif — Blockchain — Réseau Polygon',
+    hero_title2: 'Le Jeu',
+    hero_sub: 'Une forêt silencieuse. Chaque décision change le monde. Découvrez la blockchain sans le savoir — par le jeu, la réflexion et la conséquence.',
+    hero_btn1: 'Découvrir le Jeu', hero_btn2: 'Comment ça marche →',
+    stat1: 'Offre Totale', stat2: 'Minage Requis', stat3: 'Méthodes de Gain', stat4: 'Niveaux',
+    pillars_label: 'Comment ça marche',
+    pillars_title: 'Trois façons de\n<em style="font-style:italic;color:#4ecb82">participer</em>',
+    pillars_sub: 'SFLR ne s\'achète pas — il se gagne par une participation authentique dans le monde de Silent Flora.',
+    pillar1_text: 'Jouez, contribuez au monde. SFLR est gagné par le gameplay et les contributions créatives.',
+    pillar2_text: 'Art, musique, histoires, idées. La communauté façonne le monde ensemble.',
+    pillar3_text: 'Tests, retours, partage. Ceux qui aident à construire Silent Flora contribuent à quelque chose de plus grand.',
+    learn_label: 'Le Voyage d\'Apprentissage',
+    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">vécue</em>',
+    learn_sub: 'Cinq niveaux. Cinq concepts. Pas de tutoriels. Comprendre la blockchain en la vivant.',
+    learn1_tag: 'Niveau 1 — Identité', learn1_title: 'Entrez un nom. Commencez à jouer.',
+    learn1_text: 'Un portefeuille est créé en arrière-plan. Le joueur le découvre quand la curiosité l\'y mène.',
+    learn2_tag: 'Niveau 2 — Valeur', learn2_title: 'Les décisions apportent des récompenses.',
+    learn2_text: 'SFLR est gagné par le gameplay. La valeur est créée par l\'action — pas par l\'achat.',
+    learn3_tag: 'Niveau 3 — Échange', learn3_title: 'Utilisez des tokens dans le monde.',
+    learn3_text: 'Les tokens ouvrent de nouvelles zones et peuvent être partagés avec d\'autres joueurs.',
+    learn4_tag: 'Niveau 4 — Communauté', learn4_title: 'Votre voix façonne le monde.',
+    learn4_text: 'Les joueurs donnent leur avis sur la suite. La participation communautaire est vécue comme une vraie contribution.',
+    token_label: 'Le Token',
+    token_sub: 'SFLR est le token utilitaire de Silent Flora. Il est gagné par le jeu et utilisé dans le monde du jeu. Ce n\'est pas un instrument financier.',
     token_btn: 'Voir sur Polygonscan →',
-    tok1: 'Communauté / Gagner', tok2: 'Écosystème / Jeu', tok3: 'Prévente (ICO)', tok4: 'Équipe / Réserve', tok5: 'Aucun ✓',
-    game_label: 'Le Jeu', game_title: 'Ce qui arrive\nquand nous agissons\n<em style="font-style:italic;color:#4ecb82">mal</em>',
-    game_sub: 'SilentFlora — le jeu — montre ce qui est en jeu. Pas comme une leçon. Comme une expérience.',
+    tok1: 'Récompenses Joueurs', tok2: 'Écosystème Jeu', tok3: 'Accès Communauté', tok4: 'Développement / Réserve', tok5: 'Aucun ✓',
+    notice_text: 'SFLR est un token utilitaire pour le jeu Silent Flora. Ce n\'est pas un instrument financier et aucun rendement n\'est promis.',
+    notice_link_de: 'Aperçu (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: 'Le Jeu',
+    game_title: 'Ce qui arrive\nquand on agit\n<em style="font-style:italic;color:#4ecb82">sans réfléchir</em>',
+    game_sub: 'Silent Flora montre ce qui est en jeu — pas comme une leçon, mais comme une expérience.',
     game_btn: 'Jeu bientôt disponible →',
-    manifesto_quote: '"Je ne suis pas un idéaliste. Mais je vois comment nous détruisons tout avec les mauvaises incitations."',
-    cta_title: 'Prêt pour l\'<em>Écosystème?</em>', cta_sub: 'SFLR est live sur Polygon. Rejoignez la première communauté.',
-    cta_btn1: 'Voir le Token', cta_btn2: 'En savoir plus →', footer_wp: 'Livre Blanc'
+    manifesto_quote: '"La blockchain n\'est pas pour les spéculateurs. Elle est pour tous. Silent Flora est le pont."',
+    cta_title: 'Prêt à\n<em>explorer?</em>',
+    cta_sub: 'Silent Flora est en développement. Suivez le voyage depuis le début.',
+    cta_btn1: 'Voir le Token', cta_btn2: 'Le Jeu →',
+    footer_overview: 'Aperçu du Projet'
   },
   es: {
-    nav_ecosystem: 'Ecosistema', nav_token: 'Token', nav_game: 'Juego', nav_manifesto: 'Manifiesto', nav_cta: 'Obtener SFLR',
-    hero_eyebrow: 'Ecosistema IA Descentralizado — Red Polygon',
-    hero_sub: 'Sin minería. Sin energía desperdiciada. La acción real es recompensada — jugando, creando y generando impacto. Esta es la nueva economía.',
-    hero_btn1: 'Descubrir Token', hero_btn2: 'El Juego →',
-    stat1: 'Suministro Total', stat2: 'Minería Requerida', stat3: 'Métodos de Ganancia', stat4: 'Tarifa Ecosistema',
-    pillars_label: 'Los Tres Pilares', pillars_title: 'Cómo\n<em style="font-style:italic;color:#4ecb82">ganas</em>',
-    pillars_sub: 'SFLR no se mina — se gana. A través de tres formas fundamentales de actuar.',
-    pillar1_text: 'Juega, contribuye, da forma a la comunidad. SilentFlora recompensa el tiempo de juego real y las contribuciones creativas.',
-    pillar2_text: 'Arte, música, historias, mods. La comunidad vota — el buen contenido es recompensado con SFLR.',
-    pillar3_text: 'Acciones reales más allá de la pantalla. Contribuciones positivas verificadas al mundo — recompensadas en SFLR.',
-    eco_label: 'El Ecosistema', eco_title: 'Más que\nun token',
-    eco1_title: 'Servicios IA pagaderos en SFLR, BTC, ETH', eco1_text: 'Texto, imagen, video, código — todos los servicios IA aceptan múltiples monedas. Los titulares SFLR obtienen ventajas.',
-    eco2_title: 'Tu agente IA personal', eco2_text: 'Se conecta a todo. Hace lo que le dices. El primer asistente doméstico verdaderamente descentralizado.',
-    eco3_title: 'La comunidad decide', eco3_text: 'Los titulares SFLR votan. Nuevas funciones, asociaciones, lanzamientos de tokens — verdadera democracia descentralizada.',
-    eco4_title: 'Paga con lo que quieras', eco4_text: 'BTC, ETH, BNB, SFLR — el ecosistema acepta todo. SFLR es la moneda de la casa con beneficios adicionales.',
-    token_label: 'El Token', token_sub: 'Diseñado para un ecosistema que crece. No para especulación — para utilidad real.',
+    nav_game: 'Juego', nav_learn: 'Aprender', nav_token: 'Token', nav_manifesto: 'Manifiesto', nav_cta: 'Explorar',
+    hero_eyebrow: 'Juego Narrativo — Blockchain — Red Polygon',
+    hero_title2: 'El Juego',
+    hero_sub: 'Un bosque silencioso. Cada decisión cambia el mundo. Experimenta blockchain sin saberlo — a través del juego, la reflexión y la consecuencia.',
+    hero_btn1: 'Descubrir el Juego', hero_btn2: 'Cómo funciona →',
+    stat1: 'Suministro Total', stat2: 'Minería Requerida', stat3: 'Métodos de Participación', stat4: 'Niveles',
+    pillars_label: 'Cómo funciona',
+    pillars_title: 'Tres formas de\n<em style="font-style:italic;color:#4ecb82">participar</em>',
+    pillars_sub: 'SFLR no se compra — se gana mediante participación genuina en el mundo de Silent Flora.',
+    pillar1_text: 'Juega, contribuye al mundo. SFLR se gana a través del gameplay y contribuciones creativas.',
+    pillar2_text: 'Arte, música, historias, ideas. La comunidad da forma al mundo juntos.',
+    pillar3_text: 'Pruebas, feedback, compartir. Quienes ayudan a construir Silent Flora contribuyen a algo más grande.',
+    learn_label: 'El Viaje de Aprendizaje',
+    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">vivida</em>',
+    learn_sub: 'Cinco niveles. Cinco conceptos. Sin tutoriales. Entiendes blockchain viviéndola.',
+    learn1_tag: 'Nivel 1 — Identidad', learn1_title: 'Ingresa un nombre. Empieza a jugar.',
+    learn1_text: 'Una wallet se crea en segundo plano. El jugador la descubre cuando la curiosidad lo lleva allí.',
+    learn2_tag: 'Nivel 2 — Valor', learn2_title: 'Las decisiones traen recompensas.',
+    learn2_text: 'SFLR se gana a través del gameplay. El valor se crea con acción — no con compra.',
+    learn3_tag: 'Nivel 3 — Intercambio', learn3_title: 'Usa tokens en el mundo.',
+    learn3_text: 'Los tokens abren nuevas áreas y pueden compartirse con otros jugadores.',
+    learn4_tag: 'Nivel 4 — Comunidad', learn4_title: 'Tu voz da forma al mundo.',
+    learn4_text: 'Los jugadores dan feedback sobre lo que sucede después. La participación comunitaria se vive como contribución real.',
+    token_label: 'El Token',
+    token_sub: 'SFLR es el token utilitario del juego Silent Flora. Se gana jugando y se usa dentro del mundo del juego. No es un instrumento financiero.',
     token_btn: 'Ver en Polygonscan →',
-    tok1: 'Comunidad / Ganar', tok2: 'Ecosistema / Juego', tok3: 'Preventa (ICO)', tok4: 'Equipo / Reserva', tok5: 'Ninguno ✓',
-    game_label: 'El Juego', game_title: 'Qué pasa\ncuando actuamos\n<em style="font-style:italic;color:#4ecb82">mal</em>',
-    game_sub: 'SilentFlora — el juego — muestra lo que está en juego. No como una lección. Como una experiencia.',
+    tok1: 'Recompensas Jugadores', tok2: 'Ecosistema Juego', tok3: 'Acceso Comunidad', tok4: 'Desarrollo / Reserva', tok5: 'Ninguno ✓',
+    notice_text: 'SFLR es un token utilitario para uso dentro del juego Silent Flora. No es un instrumento financiero y no se promete ningún rendimiento.',
+    notice_link_de: 'Resumen (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: 'El Juego',
+    game_title: 'Qué pasa\ncuando actuamos\n<em style="font-style:italic;color:#4ecb82">sin pensar</em>',
+    game_sub: 'Silent Flora muestra lo que está en juego — no como lección, sino como experiencia.',
     game_btn: 'Juego próximamente →',
-    manifesto_quote: '"No soy un idealista. Pero veo cómo lo estamos destruyendo todo con los incentivos equivocados."',
-    cta_title: '¿Listo para el\n<em>Ecosistema?</em>', cta_sub: 'SFLR está live en Polygon. Únete a la primera comunidad.',
-    cta_btn1: 'Ver Token', cta_btn2: 'Saber más →', footer_wp: 'Libro Blanco'
+    manifesto_quote: '"Blockchain no es para especuladores. Es para todos. Silent Flora es el puente."',
+    cta_title: 'Listo para\n<em>explorar?</em>',
+    cta_sub: 'Silent Flora está en desarrollo. Sigue el viaje desde el principio.',
+    cta_btn1: 'Ver Token', cta_btn2: 'El Juego →',
+    footer_overview: 'Resumen del Proyecto'
   },
   zh: {
-    nav_ecosystem: '生态系统', nav_token: '代币', nav_game: '游戏', nav_manifesto: '宣言', nav_cta: '获取 SFLR',
-    hero_eyebrow: '去中心化 AI 生态系统 — Polygon 网络',
-    hero_sub: '无需挖矿。无需浪费能源。真实行动将获得奖励 — 通过游戏、创作和产生影响。这是新经济。',
-    hero_btn1: '发现代币', hero_btn2: '游戏 →',
-    stat1: '总供应量', stat2: '需要挖矿', stat3: '赚取方式', stat4: '生态系统费用',
-    pillars_label: '三大支柱', pillars_title: '如何\n<em style="font-style:italic;color:#4ecb82">赚取</em>',
-    pillars_sub: 'SFLR 不是挖矿得来的 — 而是赚取的。通过三种基本行动方式。',
-    pillar1_text: '游戏、贡献、塑造社区。SilentFlora 奖励真实游戏时间和创意贡献。',
-    pillar2_text: '艺术、音乐、故事、模组。社区投票 — 好内容将获得 SFLR 奖励。',
-    pillar3_text: '屏幕之外的真实行动。经过验证的对世界的积极贡献 — 以 SFLR 奖励。',
-    eco_label: '生态系统', eco_title: '不仅仅是\n一个代币',
-    eco1_title: 'AI 服务可用 SFLR、BTC、ETH 支付', eco1_text: '文本、图像、视频、代码 — 所有 AI 服务接受多种货币。SFLR 持有者获得优势。',
-    eco2_title: '您的个人 AI 助手', eco2_text: '连接一切。执行您的指令。第一个真正去中心化的家庭助手 — 由 SFLR 驱动。',
-    eco3_title: '社区决定', eco3_text: 'SFLR 持有者投票。新功能、合作伙伴关系、代币发行 — 真正的去中心化民主。',
-    eco4_title: '用您想要的方式支付', eco4_text: 'BTC、ETH、BNB、SFLR — 生态系统接受一切。SFLR 是具有额外好处的主要货币。',
-    token_label: '代币', token_sub: '为不断成长的生态系统而设计。不是为了投机 — 而是为了真正的效用。',
-    token_btn: '在 Polygonscan 查看 →',
-    tok1: '社区 / 赚取', tok2: '生态系统 / 游戏', tok3: '预售 (ICO)', tok4: '团队 / 储备', tok5: '无 ✓',
-    game_label: '游戏', game_title: '当我们\n<em style="font-style:italic;color:#4ecb82">错误</em>\n行事时会发生什么',
-    game_sub: 'SilentFlora — 游戏 — 展示了什么处于危险之中。不是作为说教。而是作为一种体验。',
+    nav_game: '游戏', nav_learn: '学习', nav_token: '代币', nav_manifesto: '宣言', nav_cta: '探索',
+    hero_eyebrow: '叙事游戏 — 区块链 — Polygon 网络',
+    hero_title2: '游戏',
+    hero_sub: '一片寂静的森林。每个决定都会改变世界。在不知不觉中体验区块链 — 通过游戏、反思和后果。',
+    hero_btn1: '发现游戏', hero_btn2: '如何运作 →',
+    stat1: '总供应量', stat2: '需要挖矿', stat3: '参与方式', stat4: '学习关卡',
+    pillars_label: '如何运作',
+    pillars_title: '三种\n<em style="font-style:italic;color:#4ecb82">参与</em>方式',
+    pillars_sub: 'SFLR不是购买的 — 而是通过在Silent Flora世界中真实参与获得的。',
+    pillar1_text: '游戏、为世界做贡献。SFLR通过真实游戏和创意贡献获得。',
+    pillar2_text: '艺术、音乐、故事、想法。社区共同塑造世界。',
+    pillar3_text: '测试、反馈、分享。帮助建设Silent Flora的人贡献于更大的事业。',
+    learn_label: '学习之旅',
+    learn_title: '区块链 —\n<em style="font-style:italic;color:#4ecb82">亲身体验</em>',
+    learn_sub: '五个关卡。五个概念。无需教程。通过体验理解区块链。',
+    learn1_tag: '关卡1 — 身份', learn1_title: '输入名字。开始游戏。',
+    learn1_text: '钱包在后台自动创建。玩家在好奇心驱使下发现它。',
+    learn2_tag: '关卡2 — 价值', learn2_title: '决策带来奖励。',
+    learn2_text: 'SFLR通过游戏获得。价值通过行动创造 — 而非购买。',
+    learn3_tag: '关卡3 — 交换', learn3_title: '在世界中使用代币。',
+    learn3_text: '代币开启新区域，可与其他玩家分享。',
+    learn4_tag: '关卡4 — 社区', learn4_title: '你的声音塑造世界。',
+    learn4_text: '玩家对接下来发生的事情给出反馈。',
+    token_label: '代币',
+    token_sub: 'SFLR是Silent Flora游戏的实用代币。通过游戏获得，在游戏世界中使用。不是金融工具。',
+    token_btn: '在Polygonscan查看 →',
+    tok1: '玩家奖励', tok2: '游戏生态', tok3: '早期社区访问', tok4: '开发/储备', tok5: '无 ✓',
+    notice_text: 'SFLR是用于Silent Flora游戏的实用代币。不是金融工具，不承诺任何财务回报。',
+    notice_link_de: '项目概览 (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: '游戏',
+    game_title: '当我们\n<em style="font-style:italic;color:#4ecb82">不加思考</em>\n行动时会发生什么',
+    game_sub: 'Silent Flora展示了什么处于危险之中 — 不是说教，而是体验。',
     game_btn: '游戏即将推出 →',
-    manifesto_quote: '"我不是一个理想主义者。但我看到我们如何用错误的激励机制摧毁一切。"',
-    cta_title: '准备好迎接\n<em>生态系统</em>了吗？', cta_sub: 'SFLR 在 Polygon 上线。成为第一个社区的一部分。',
-    cta_btn1: '查看代币', cta_btn2: '了解更多 →', footer_wp: '白皮书'
+    manifesto_quote: '"区块链不是为投机者准备的。它是为所有人准备的。Silent Flora是那座桥。"',
+    cta_title: '准备好\n<em>探索了吗？</em>',
+    cta_sub: 'Silent Flora正在开发中。从一开始就跟随这段旅程。',
+    cta_btn1: '查看代币', cta_btn2: '游戏 →',
+    footer_overview: '项目概览'
+  },
+  ko: {
+    nav_game: '게임', nav_learn: '배우기', nav_token: '토큰', nav_manifesto: '선언', nav_cta: '탐색',
+    hero_eyebrow: '내러티브 게임 — 블록체인 — Polygon 네트워크',
+    hero_title2: '게임',
+    hero_sub: '조용한 숲. 모든 결정이 세상을 바꿉니다. 알지 못한 채 블록체인을 경험하세요 — 놀이, 성찰, 결과를 통해.',
+    hero_btn1: '게임 발견', hero_btn2: '작동 방식 →',
+    stat1: '총 공급량', stat2: '채굴 필요', stat3: '참여 방법', stat4: '학습 레벨',
+    pillars_label: '작동 방식',
+    pillars_title: '세 가지\n<em style="font-style:italic;color:#4ecb82">참여</em> 방법',
+    pillars_sub: 'SFLR은 구매하는 것이 아닙니다 — Silent Flora 세계에서 진정한 참여를 통해 획득합니다.',
+    pillar1_text: '게임을 플레이하고 세계에 기여하세요. SFLR은 진정한 게임플레이와 창의적 기여를 통해 획득됩니다.',
+    pillar2_text: '예술, 음악, 이야기, 아이디어. 커뮤니티가 함께 세계를 만들어 갑니다.',
+    pillar3_text: '테스트, 피드백, 공유. Silent Flora 구축을 돕는 사람들은 게임보다 더 큰 것에 기여합니다.',
+    learn_label: '학습 여정',
+    learn_title: '블록체인 —\n<em style="font-style:italic;color:#4ecb82">경험</em>',
+    learn_sub: '다섯 레벨. 다섯 개념. 튜토리얼 없음. 공부가 아닌 체험으로 블록체인을 이해하세요.',
+    learn1_tag: '레벨 1 — 정체성', learn1_title: '이름을 입력하세요. 게임을 시작하세요.',
+    learn1_text: '게임은 즉시 시작됩니다 — 시작에 지갑이 필요하지 않습니다. 자신의 지갑을 연결하고 싶은 플레이어는 언제든지 할 수 있습니다. Silent Flora는 개인 키를 보유하거나 관리하지 않습니다.',
+    learn2_tag: '레벨 2 — 가치', learn2_title: '결정이 보상을 가져옵니다.',
+    learn2_text: 'SFLR은 게임플레이를 통해 획득됩니다. 가치는 구매가 아닌 행동으로 만들어집니다.',
+    learn3_tag: '레벨 3 — 교환', learn3_title: '세계에서 토큰을 사용하세요.',
+    learn3_text: '토큰이 새로운 영역을 열고 다른 플레이어와 공유할 수 있습니다.',
+    learn4_tag: '레벨 4 — 커뮤니티', learn4_title: '당신의 목소리가 세계를 만듭니다.',
+    learn4_text: '플레이어들이 다음에 일어날 일에 대한 피드백을 제공합니다.',
+    token_label: '토큰',
+    token_sub: 'SFLR은 Silent Flora의 인게임 유틸리티 토큰입니다. 게임을 통해 획득하고 게임 세계 내에서 사용됩니다. 금융 상품이 아닙니다.',
+    token_btn: 'Polygonscan에서 보기 →',
+    tok1: '플레이어 보상', tok2: '게임 생태계', tok3: '얼리 커뮤니티 접근', tok4: '개발 / 예비', tok5: '없음 ✓',
+    notice_text: 'SFLR은 Silent Flora 게임 내 사용을 위한 유틸리티 토큰입니다. 금융 상품이 아니며 어떠한 재무적 수익도 약속하거나 암시하지 않습니다.',
+    notice_link_de: '프로젝트 개요 (DE)', notice_link_en: 'Project Overview (EN)',
+    game_label: '게임',
+    game_title: '생각 없이\n행동하면\n<em style="font-style:italic;color:#4ecb82">어떻게 될까요</em>',
+    game_sub: 'Silent Flora는 무엇이 위태로운지 보여줍니다 — 강의가 아닌 경험으로.',
+    game_btn: '게임 곧 출시 →',
+    manifesto_quote: '"블록체인은 투기꾼을 위한 것이 아닙니다. 모두를 위한 것입니다. Silent Flora가 그 다리입니다."',
+    cta_title: '탐색할\n<em>준비가 되셨나요?</em>',
+    cta_sub: 'Silent Flora는 개발 중입니다. 처음부터 커뮤니티의 일원이 되세요.',
+    cta_btn1: '토큰 보기', cta_btn2: '게임 →',
+    footer_overview: '프로젝트 개요'
   }
 };
 
@@ -757,24 +717,102 @@ function setLang(lang) {
   currentLang = lang;
   const t = i18n[lang];
   if (!t) return;
-
-  // Update all elements with data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (t[key] !== undefined) {
-      el.innerHTML = t[key].replace(/\n/g, '<br>');
-    }
+    if (t[key] !== undefined) el.innerHTML = t[key].replace(/\n/g, '<br>');
   });
-
-  // Update lang buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.toLowerCase() === lang ||
-      (lang === 'zh' && btn.textContent === '中文'));
+    btn.classList.toggle('active',
+      btn.textContent.toLowerCase() === lang ||
+      (lang === 'zh' && btn.textContent === '中文') ||
+      (lang === 'ko' && btn.textContent === '한국어')
+    );
   });
-
-  // Update html lang
   document.documentElement.lang = lang;
 }
+
+// THREE.JS EARTH
+(function() {
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  script.onload = function() {
+    const canvas = document.getElementById('earth-canvas');
+    if (!canvas) return;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(160, 160);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.z = 2.5;
+
+    // Earth sphere
+    const geo = new THREE.SphereGeometry(1, 64, 64);
+
+    // Create canvas texture for Earth
+    const texCanvas = document.createElement('canvas');
+    texCanvas.width = 512; texCanvas.height = 256;
+    const ctx = texCanvas.getContext('2d');
+
+    // Ocean
+    ctx.fillStyle = '#0d2b4a';
+    ctx.fillRect(0, 0, 512, 256);
+
+    // Land masses
+    ctx.fillStyle = '#2d7a3a';
+    // Europe/Africa
+    ctx.beginPath(); ctx.ellipse(230, 110, 25, 55, -0.2, 0, Math.PI*2); ctx.fill();
+    // Americas
+    ctx.beginPath(); ctx.ellipse(100, 120, 22, 60, 0.1, 0, Math.PI*2); ctx.fill();
+    // Asia
+    ctx.beginPath(); ctx.ellipse(370, 100, 60, 40, 0, 0, Math.PI*2); ctx.fill();
+    // Australia
+    ctx.beginPath(); ctx.ellipse(420, 170, 25, 18, 0, 0, Math.PI*2); ctx.fill();
+    // Ice caps
+    ctx.fillStyle = 'rgba(220,240,255,0.5)';
+    ctx.beginPath(); ctx.ellipse(256, 8, 120, 12, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(256, 248, 110, 10, 0, 0, Math.PI*2); ctx.fill();
+    // Clouds
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.beginPath(); ctx.ellipse(160, 60, 50, 12, -0.3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(330, 140, 40, 10, 0.2, 0, Math.PI*2); ctx.fill();
+
+    const texture = new THREE.CanvasTexture(texCanvas);
+    const mat = new THREE.MeshPhongMaterial({
+      map: texture,
+      specular: new THREE.Color(0x2d9e5f),
+      shininess: 15,
+    });
+
+    const earth = new THREE.Mesh(geo, mat);
+    scene.add(earth);
+
+    // Atmosphere glow
+    const atmGeo = new THREE.SphereGeometry(1.05, 64, 64);
+    const atmMat = new THREE.MeshPhongMaterial({
+      color: 0x4ecb82,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.FrontSide,
+    });
+    scene.add(new THREE.Mesh(atmGeo, atmMat));
+
+    // Lights
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(3, 1, 2);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0x1a3a2a, 0.8));
+
+    function animate() {
+      requestAnimationFrame(animate);
+      earth.rotation.y += 0.003;
+      renderer.render(scene, camera);
+    }
+    animate();
+  };
+  document.head.appendChild(script);
+})();
 
 // Cursor
 const cursor = document.getElementById('cursor');
