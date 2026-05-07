@@ -369,7 +369,7 @@ footer{border-top:1px solid var(--bd);padding:40px 48px;display:flex;justify-con
     cx.beginPath();cx.ellipse(298,118,82,19,-.3,0,Math.PI*2);cx.fill();
     cx.beginPath();cx.ellipse(648,78,62,14,.2,0,Math.PI*2);cx.fill();
     cx.beginPath();cx.ellipse(148,302,52,14,.1,0,Math.PI*2);cx.fill();
-    var tex=new THREE.CanvasTexture(tc);
+    var tex=loader.load('earth.jpg');
     var geo=new THREE.SphereGeometry(1,64,64);
     var mat=new THREE.MeshPhongMaterial({map:tex,specular:new THREE.Color(0x1a3a5a),shininess:25});
     var earth=new THREE.Mesh(geo,mat);scene.add(earth);
