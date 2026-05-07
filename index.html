@@ -133,6 +133,10 @@ section{padding:120px 48px;position:relative}
 .trv.g{color:var(--gl)}
 .nb{background:rgba(45,158,95,.06);border-top:1px solid var(--bg);border-bottom:1px solid var(--bg);padding:20px 48px;text-align:center}
 .nb p{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mt);line-height:1.7}
+.gmom{margin:0 0 40px;display:flex;flex-direction:column;gap:16px}
+.gmom-item{border-left:2px solid var(--g);padding:12px 20px;background:rgba(45,158,95,.05)}
+.gmom-if{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--g);display:block;margin-bottom:4px}
+.gmom-then{font-size:18px;font-weight:300;font-style:italic;color:var(--tx)}
 .gmsec{background:var(--bk)}
 .gi{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
 .gframe{aspect-ratio:1;border:1px solid var(--bg);background:var(--cd);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
@@ -275,6 +279,16 @@ footer{border-top:1px solid var(--bd);padding:40px 48px;display:flex;justify-con
       <p class="slb" data-t="gl">The Game</p>
       <h2 class="stl" data-t="gt">What happens when we act <em>without thinking</em></h2>
       <p class="ssu" data-t="gd">A quiet forest. A wandering figure. Every decision leaves a mark.</p>
+      <div class="gmom rv">
+        <div class="gmom-item">
+          <span class="gmom-if">If you follow the fox →</span>
+          <span class="gmom-then">the last tree survives. The world grows greener.</span>
+        </div>
+        <div class="gmom-item">
+          <span class="gmom-if">If you ignore it →</span>
+          <span class="gmom-then">half the forest disappears. And so do you.</span>
+        </div>
+      </div>
       <div class="ha"><a href="#" class="bs" data-t="gb">Game coming soon →</a></div>
     </div>
     <div class="rv">
