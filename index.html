@@ -5,993 +5,408 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SilentFlora — The Living Game</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --black: #050507;
-    --deep: #0a0a0f;
-    --surface: #111118;
-    --card: #16161f;
-    --green-dark: #0d3320;
-    --green-mid: #1a5c38;
-    --green: #2d9e5f;
-    --green-light: #4ecb82;
-    --green-glow: rgba(45,158,95,0.15);
-    --amber: #c8922a;
-    --text: #e8e4d9;
-    --text-muted: #7a7870;
-    --text-dim: #3a3832;
-    --border: rgba(255,255,255,0.06);
-    --border-green: rgba(45,158,95,0.25);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
-
-  .cursor { position:fixed; width:8px; height:8px; background:var(--green-light); border-radius:50%; pointer-events:none; z-index:9999; transition:transform 0.1s; mix-blend-mode:screen; }
-  .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(78,203,130,0.4); border-radius:50%; pointer-events:none; z-index:9998; transition:all 0.15s; }
-
-  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
-
-  /* LANGUAGE BAR */
-  .lang-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 200;
-    background: rgba(5,5,7,0.95);
-    border-bottom: 1px solid var(--border);
-    padding: 8px 48px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 4px;
-    backdrop-filter: blur(8px);
-  }
-
-  .lang-btn { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--text-muted); background:transparent; border:1px solid transparent; padding:4px 10px; cursor:none; text-transform:uppercase; transition:all 0.2s; }
-  .lang-btn:hover { color:var(--green-light); border-color:var(--border-green); }
-  .lang-btn.active { color:var(--green-light); border-color:var(--border-green); background:var(--green-glow); }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 33px; left: 0; right: 0;
-    z-index: 100;
-    padding: 20px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, rgba(5,5,7,0.9), transparent);
-    backdrop-filter: blur(8px);
-  }
-
-  .nav-logo { font-family:'Space Mono',monospace; font-size:13px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
-  .nav-links { display:flex; gap:40px; list-style:none; }
-  .nav-links a { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.15em; color:var(--text-muted); text-decoration:none; text-transform:uppercase; transition:color 0.3s; }
-  .nav-links a:hover { color:var(--green-light); }
-  .nav-cta { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; color:var(--green-light); border:1px solid var(--border-green); padding:10px 20px; text-decoration:none; text-transform:uppercase; transition:all 0.3s; }
-  .nav-cta:hover { background:var(--green-glow); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 160px 48px 80px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-bg { position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 70% 50%, rgba(13,51,32,0.4) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45,158,95,0.08) 0%, transparent 60%); }
-
-  .orb { position:absolute; border-radius:50%; filter:blur(80px); animation:orbFloat 12s ease-in-out infinite; pointer-events:none; }
-  .orb-1 { width:500px; height:500px; background:radial-gradient(circle, rgba(45,158,95,0.12), transparent 70%); right:-100px; top:10%; }
-  .orb-2 { width:300px; height:300px; background:radial-gradient(circle, rgba(13,51,32,0.3), transparent 70%); left:10%; bottom:20%; animation-delay:-4s; }
-  .orb-3 { width:200px; height:200px; background:radial-gradient(circle, rgba(78,203,130,0.06), transparent 70%); right:30%; top:30%; animation-delay:-8s; }
-
-  @keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.05)} 66%{transform:translate(-20px,15px) scale(0.95)} }
-
-  .hero-content { position:relative; z-index:2; max-width:900px; }
-  .hero-eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.3em; color:var(--green); text-transform:uppercase; margin-bottom:24px; opacity:0; animation:fadeUp 1s ease 0.3s forwards; }
-  .hero-title { font-size:clamp(64px,10vw,140px); font-weight:300; line-height:0.9; letter-spacing:-0.02em; margin-bottom:8px; opacity:0; animation:fadeUp 1s ease 0.5s forwards; }
-  .hero-title em { font-style:italic; color:var(--green-light); }
-  .hero-title-2 { font-size:clamp(64px,10vw,140px); font-weight:300; line-height:0.9; letter-spacing:-0.02em; color:var(--text-dim); margin-bottom:48px; opacity:0; animation:fadeUp 1s ease 0.7s forwards; }
-  .hero-sub { font-size:20px; font-weight:300; line-height:1.7; color:var(--text-muted); max-width:560px; margin-bottom:56px; opacity:0; animation:fadeUp 1s ease 0.9s forwards; }
-  .hero-actions { display:flex; gap:20px; align-items:center; opacity:0; animation:fadeUp 1s ease 1.1s forwards; }
-
-  .btn-primary { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--black); background:var(--green-light); padding:16px 32px; text-decoration:none; transition:all 0.3s; border:none; cursor:none; display:inline-block; }
-  .btn-primary:hover { background:var(--green); transform:translateY(-2px); }
-  .btn-secondary { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); text-decoration:none; display:flex; align-items:center; gap:8px; transition:color 0.3s; }
-  .btn-secondary:hover { color:var(--green-light); }
-
-  /* EARTH TOKEN */
-  .token-badge { position:absolute; right:48px; top:50%; transform:translateY(-50%); z-index:2; opacity:0; animation:fadeIn 1.5s ease 1.5s forwards; }
-  .token-ring-outer { width:300px; height:300px; position:relative; display:flex; align-items:center; justify-content:center; }
-  .ring-orbit { position:absolute; inset:0; border-radius:50%; border:1px solid var(--border-green); animation:spin 20s linear infinite; }
-  .ring-orbit::before { content:''; position:absolute; inset:-1px; border-radius:50%; background:conic-gradient(from 0deg, transparent 0%, var(--green) 8%, transparent 16%); animation:spin 3s linear infinite; -webkit-mask:radial-gradient(circle at center, transparent 48%, black 49%); }
-  .orbit-dot { position:absolute; width:6px; height:6px; background:var(--green-light); border-radius:50%; top:-3px; left:calc(50% - 3px); transform-origin:3px 153px; box-shadow:0 0 8px var(--green-light); }
-  .orbit-dot:nth-child(2) { animation:spin 20s linear infinite; }
-  .orbit-dot:nth-child(3) { animation:spin 20s linear infinite; animation-delay:-6.6s; }
-  .orbit-dot:nth-child(4) { animation:spin 20s linear infinite; animation-delay:-13.3s; }
-  .ring-inner { width:220px; height:220px; border-radius:50%; border:1px solid rgba(78,203,130,0.15); display:flex; align-items:center; justify-content:center; position:relative; animation:spinReverse 40s linear infinite; }
-  #earth-canvas { width:160px !important; height:160px !important; border-radius:50%; box-shadow:0 0 40px rgba(45,158,95,0.3), 0 0 80px rgba(45,158,95,0.1); }
-  .token-label { position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); text-align:center; white-space:nowrap; }
-  .token-label-sym { font-family:'Space Mono',monospace; font-size:14px; color:var(--green-light); letter-spacing:0.3em; }
-  .token-label-net { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-muted); letter-spacing:0.2em; text-transform:uppercase; }
-
-  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  @keyframes spinReverse { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
-  @keyframes spinEarth { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-
-  /* STATS */
-  .stats-bar { position:relative; z-index:2; border-top:1px solid var(--border); padding:32px 48px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; opacity:0; animation:fadeUp 1s ease 1.3s forwards; }
-  .stat { padding:0 32px; border-right:1px solid var(--border); }
-  .stat:first-child { padding-left:0; }
-  .stat:last-child { border-right:none; }
-  .stat-value { font-size:36px; font-weight:300; color:var(--text); letter-spacing:-0.02em; }
-  .stat-value span { color:var(--green-light); }
-  .stat-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; margin-top:4px; }
-
-  /* SECTIONS */
-  section { padding:120px 48px; position:relative; }
-  .section-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.3em; color:var(--green); text-transform:uppercase; margin-bottom:16px; }
-  .section-title { font-size:clamp(40px,6vw,80px); font-weight:300; line-height:1.05; letter-spacing:-0.02em; margin-bottom:24px; }
-  .section-sub { font-size:18px; font-weight:300; color:var(--text-muted); line-height:1.8; max-width:560px; margin-bottom:64px; }
-
-  /* PILLARS */
-  .pillars { background:var(--deep); }
-  .pillars-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:64px; }
-  .pillar { background:var(--card); padding:48px 40px; position:relative; overflow:hidden; transition:background 0.4s; }
-  .pillar::before { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--green); transform:scaleX(0); transition:transform 0.4s; transform-origin:left; }
-  .pillar:hover { background:var(--surface); }
-  .pillar:hover::before { transform:scaleX(1); }
-  .pillar-number { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.2em; margin-bottom:32px; }
-  .pillar-icon { font-size:40px; margin-bottom:24px; }
-  .pillar-title { font-size:28px; font-weight:400; margin-bottom:16px; }
-  .pillar-title em { font-style:italic; color:var(--green-light); }
-  .pillar-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
-
-  /* ROADMAP */
-  .roadmap-section { background:var(--deep); padding:120px 48px; }
-  .roadmap-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); margin-top:64px; }
-  .road-card { background:var(--card); padding:40px 32px; position:relative; overflow:hidden; transition:background 0.3s; }
-  .road-card:hover { background:var(--surface); }
-  .road-card.done { border-top:2px solid var(--green-light); }
-  .road-card.current { border-top:2px solid var(--gold); }
-  .road-card:not(.done):not(.current) { border-top:2px solid var(--text-dim); }
-  .road-phase { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; }
-  .road-status { display:inline-block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; padding:3px 8px; margin-bottom:20px; }
-  .done-badge { color:var(--green-light); background:rgba(78,203,130,0.1); border:1px solid rgba(78,203,130,0.3); }
-  .current-badge { color:var(--amber); background:rgba(200,146,42,0.1); border:1px solid rgba(200,146,42,0.3); }
-  .plan-badge { color:var(--text-muted); background:rgba(255,255,255,0.03); border:1px solid var(--border); }
-  .road-title { font-size:22px; font-weight:300; color:var(--text); margin-bottom:16px; }
-  .road-items { list-style:none; display:flex; flex-direction:column; gap:8px; }
-  .road-items li { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.05em; color:var(--text-muted); padding-left:16px; position:relative; }
-  .road-items li::before { content:'—'; position:absolute; left:0; color:var(--green-dark); }
-
-  /* LEARNING */
-  .learning { background:var(--black); }
-  .learning-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:64px; }
-  .learn-card { background:var(--card); border:1px solid var(--border); padding:40px; position:relative; overflow:hidden; transition:border-color 0.3s; }
-  .learn-card:hover { border-color:var(--border-green); }
-  .learn-card::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(to right, transparent, var(--green), transparent); opacity:0; transition:opacity 0.4s; }
-  .learn-card:hover::after { opacity:1; }
-  .learn-tag { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
-  .learn-tag::before { content:''; width:20px; height:1px; background:var(--green); }
-  .learn-title { font-size:26px; font-weight:300; margin-bottom:16px; line-height:1.2; }
-  .learn-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
-
-  /* TOKEN SECTION */
-  .token-section { background:var(--deep); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-  .token-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
-  .token-info h2 { font-size:clamp(40px,5vw,72px); font-weight:300; line-height:1.05; margin-bottom:24px; }
-  .token-info h2 em { font-style:italic; color:var(--green-light); }
-  .token-info p { font-size:18px; font-weight:300; color:var(--text-muted); line-height:1.8; margin-bottom:40px; }
-  .token-address { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:16px 20px; letter-spacing:0.05em; margin-bottom:32px; word-break:break-all; line-height:1.6; }
-  .token-address span { display:block; font-size:9px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:8px; }
-  .tokenomics { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); }
-  .trow { display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid var(--border); transition:background 0.2s; }
-  .trow:last-child { border-bottom:none; }
-  .trow:hover { background:var(--surface); }
-  .trow-label { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.1em; color:var(--text-muted); text-transform:uppercase; }
-  .trow-value { font-size:20px; font-weight:300; color:var(--text); }
-  .trow-value.green { color:var(--green-light); }
-
-  /* GAME */
-  .game-section { background:var(--black); }
-  .game-inner { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
-  .game-frame { aspect-ratio:1; border:1px solid var(--border-green); background:var(--card); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-  .game-frame::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 40%, rgba(45,158,95,0.15), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(13,51,32,0.3), transparent 50%); }
-  .game-placeholder { font-size:100px; opacity:0.2; z-index:1; }
-  .game-label { position:absolute; bottom:20px; left:20px; right:20px; font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; }
-  .game-corner { position:absolute; width:20px; height:20px; border-color:var(--green); border-style:solid; }
-  .game-corner.tl { top:-1px; left:-1px; border-width:2px 0 0 2px; }
-  .game-corner.tr { top:-1px; right:-1px; border-width:2px 2px 0 0; }
-  .game-corner.bl { bottom:-1px; left:-1px; border-width:0 0 2px 2px; }
-  .game-corner.br { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
-
-  /* NOTICE */
-  .notice-bar { background:rgba(45,158,95,0.06); border-top:1px solid var(--border-green); border-bottom:1px solid var(--border-green); padding:20px 48px; text-align:center; }
-  .notice-bar p { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--text-muted); line-height:1.7; }
-  .notice-bar a { color:var(--green); text-decoration:none; }
-  .notice-bar a:hover { color:var(--green-light); }
-
-  /* MANIFESTO */
-  .manifesto { background:var(--green-dark); border-top:1px solid var(--border-green); border-bottom:1px solid var(--border-green); text-align:center; padding:120px 48px; }
-  .manifesto-quote { font-size:clamp(24px,3.5vw,48px); font-weight:300; font-style:italic; line-height:1.5; max-width:860px; margin:0 auto 32px; color:var(--text); }
-  .manifesto-attr { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
-
-  /* CTA */
-  .cta-section { background:var(--black); text-align:center; padding:160px 48px; }
-  .cta-section h2 { font-size:clamp(48px,8vw,100px); font-weight:300; line-height:1.0; margin-bottom:32px; }
-  .cta-section h2 em { font-style:italic; color:var(--green-light); }
-  .cta-section p { font-size:18px; color:var(--text-muted); margin-bottom:48px; font-weight:300; }
-  .cta-actions { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
-
-  /* FOOTER */
-  footer { border-top:1px solid var(--border); padding:40px 48px; display:flex; justify-content:space-between; align-items:center; }
-  .footer-logo { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.2em; color:var(--green-light); text-transform:uppercase; }
-  .footer-text { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.1em; }
-  .footer-links { display:flex; gap:32px; }
-  .footer-links a { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; color:var(--text-muted); text-decoration:none; text-transform:uppercase; transition:color 0.3s; }
-  .footer-links a:hover { color:var(--green-light); }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-  .reveal { opacity:0; transform:translateY(40px); transition:opacity 0.8s ease, transform 0.8s ease; }
-  .reveal.visible { opacity:1; transform:translateY(0); }
-
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--black); }
-  ::-webkit-scrollbar-thumb { background:var(--green-dark); }
-
-  @media (max-width:900px) {
-    .lang-bar { padding:8px 16px; }
-    nav { padding:20px 24px; top:33px; }
-    .nav-links { display:none; }
-    .hero { padding:140px 24px 60px; }
-    .token-badge { display:none; }
-    .stats-bar { grid-template-columns:repeat(2,1fr); padding:24px; }
-    section { padding:80px 24px; }
-    .pillars-grid,.learning-grid,.token-grid,.game-inner { grid-template-columns:1fr; }
-    footer { flex-direction:column; gap:20px; text-align:center; }
-    .notice-bar { padding:16px 24px; }
-  }
-</style>
-</head>
-<body>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <script>
-// i18n must load before buttons
-const i18n_data = {
-  en:{nav_game:'Game',nav_learn:'Learn',nav_token:'Token',nav_manifesto:'Manifesto',nav_cta:'Explore',hero_eyebrow:'Narrative Game — Blockchain — Polygon Network',hero_title2:'The Game',hero_sub:'A quiet forest. Every decision changes the world. Experience blockchain without knowing it — through play, reflection and consequence.',hero_btn1:'Discover the Game',hero_btn2:'How it works →',stat1:'Total Supply',stat2:'Mining Required',stat3:'Earn Methods',stat4:'Learning Levels',pillars_label:'How it works',pillars_title:'Three ways to\n<em style="color:#4ecb82">participate</em>',pillars_sub:'SFLR is not bought — it is earned through genuine participation in the Silent Flora world.',pillar1_text:'Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions.',pillar2_text:'Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised with SFLR.',pillar3_text:'Testing, feedback, sharing. Those who help build the Silent Flora community contribute to something larger than the game.',token_label:'The Token',token_sub:'SFLR is the in-game utility token of Silent Flora. It is earned through play and used within the game world. It is not a financial instrument.',token_btn:'View on Polygonscan →',tok1:'Player Rewards',tok2:'Game Ecosystem',tok3:'Early Community Access',tok4:'Development / Reserve',tok5:'None ✓',notice_text:'SFLR is a utility token for the Silent Flora game. Not a financial instrument. No financial return is promised or implied.',game_label:'The Game',game_title:'What happens\nwhen we act\n<em style="color:#4ecb82">without thinking</em>',game_sub:'Silent Flora shows what is at stake — not as a lecture, but as an experience.',game_btn:'Game coming soon →',manifesto_quote:'"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."',cta_title:'Ready to\n<em>explore?</em>',cta_sub:'Silent Flora is in development. Follow the journey from the beginning.',cta_btn1:'View Token',cta_btn2:'The Game →',footer_overview:'Project Overview',roadmap_label:'Roadmap',roadmap_title:'The Journey\n<em style="color:#4ecb82">ahead</em>',road_done:'✓ Complete',road_now:'← Now',road_plan:'Planned',road1_phase:'Phase 1 — Q2 2026',road1_title:'Foundation',road1_1:'Playable prototype',road1_2:'SFLR token deployed',road1_3:'silentflora.io live',road1_4:'Project overview published',road2_phase:'Phase 2 — Q3 2026',road2_title:'Community',road2_1:'X and Discord launch',road2_2:'First public demo',road2_3:'Early community access',road2_4:'Legal structure',road3_phase:'Phase 3 — Q4 2026',road3_title:'Build',road3_1:'Full game levels 1–3',road3_2:'In-game token mechanics',road3_3:'Grant applications',road3_4:'DEX listing',road4_phase:'Phase 4 — 2027',road4_title:'Launch',road4_1:'Complete game (5 levels)',road4_2:'Mobile version',road4_3:'Education version',road4_4:'Community governance'},
-  de:{nav_game:'Game',nav_learn:'Lernen',nav_token:'Token',nav_manifesto:'Manifest',nav_cta:'Entdecken',hero_eyebrow:'Narratives Spiel — Blockchain — Polygon Netzwerk',hero_title2:'Das Spiel',hero_sub:'Ein stiller Wald. Jede Entscheidung verändert die Welt. Blockchain erleben ohne es zu wissen — durch Spielen, Nachdenken und Konsequenz.',hero_btn1:'Das Spiel entdecken',hero_btn2:'Wie es funktioniert →',stat1:'Gesamtangebot',stat2:'Mining nötig',stat3:'Verdienst-Wege',stat4:'Lernlevel',pillars_label:'Wie es funktioniert',pillars_title:'Drei Wege zur\n<em style="color:#4ecb82">Teilnahme</em>',pillars_sub:'SFLR wird nicht gekauft — er wird durch echte Teilnahme in der Silent Flora Welt verdient.',pillar1_text:'Spiel das Spiel, trage zur Welt bei. SFLR wird durch echtes Gameplay und kreative Beiträge verdient.',pillar2_text:'Kunst, Musik, Geschichten, Ideen. Die Community gestaltet die Welt gemeinsam.',pillar3_text:'Testen, Feedback geben, teilen. Wer hilft Silent Flora aufzubauen, trägt zu etwas Grösserem bei.',token_label:'Der Token',token_sub:'SFLR ist der In-Game Utility Token von Silent Flora. Er wird durch Spielen verdient und innerhalb der Spielwelt verwendet. Er ist kein Finanzinstrument.',token_btn:'Auf Polygonscan ansehen →',tok1:'Spieler Belohnungen',tok2:'Spiel Ökosystem',tok3:'Früher Community-Zugang',tok4:'Entwicklung / Reserve',tok5:'Keins ✓',notice_text:'SFLR ist ein Utility Token für das Silent Flora Spiel. Kein Finanzinstrument. Keine finanzielle Rendite wird versprochen.',game_label:'Das Spiel',game_title:'Was passiert\nwenn wir\n<em style="color:#4ecb82">ohne Nachdenken</em> handeln',game_sub:'Silent Flora zeigt was auf dem Spiel steht — nicht als Predigt, sondern als Erfahrung.',game_btn:'Game coming soon →',manifesto_quote:'"Blockchain ist nicht für Spekulanten. Sie ist für alle. Silent Flora ist die Brücke."',cta_title:'Bereit zum\n<em>Entdecken?</em>',cta_sub:'Silent Flora ist in Entwicklung. Begleite die Reise von Anfang an.',cta_btn1:'Token ansehen',cta_btn2:'Das Spiel →',footer_overview:'Projektübersicht',roadmap_label:'Roadmap',roadmap_title:'Die Reise\n<em style="color:#4ecb82">voraus</em>',road_done:'✓ Abgeschlossen',road_now:'← Jetzt',road_plan:'Geplant',road1_phase:'Phase 1 — Q2 2026',road1_title:'Fundament',road1_1:'Spielbarer Prototyp',road1_2:'SFLR Token deployed',road1_3:'silentflora.io live',road1_4:'Projektübersicht veröffentlicht',road2_phase:'Phase 2 — Q3 2026',road2_title:'Community',road2_1:'X und Discord Launch',road2_2:'Erste öffentliche Demo',road2_3:'Früher Community-Zugang',road2_4:'Rechtliche Struktur',road3_phase:'Phase 3 — Q4 2026',road3_title:'Aufbau',road3_1:'Vollständige Level 1–3',road3_2:'In-Game Token Mechaniken',road3_3:'Grant-Anträge',road3_4:'DEX Listing',road4_phase:'Phase 4 — 2027',road4_title:'Launch',road4_1:'Vollständiges Spiel (5 Level)',road4_2:'Mobile Version',road4_3:'Education Version',road4_4:'Community Governance'},
-  fr:{nav_game:'Jeu',nav_learn:'Apprendre',nav_token:'Token',nav_manifesto:'Manifeste',nav_cta:'Explorer',hero_eyebrow:'Jeu Narratif — Blockchain — Réseau Polygon',hero_title2:'Le Jeu',hero_sub:'Une forêt silencieuse. Chaque décision change le monde. Découvrez la blockchain sans le savoir.',hero_btn1:'Découvrir le Jeu',hero_btn2:'Comment ça marche →',stat1:'Offre Totale',stat2:'Minage Requis',stat3:'Méthodes',stat4:'Niveaux',pillars_label:'Comment ça marche',pillars_title:'Trois façons de\n<em style="color:#4ecb82">participer</em>',pillars_sub:"SFLR ne s'achète pas — il se gagne par une participation authentique.",pillar1_text:'Jouez, contribuez. SFLR est gagné par le gameplay et les contributions créatives.',pillar2_text:'Art, musique, histoires. La communauté façonne le monde ensemble.',pillar3_text:"Tests, retours, partage. Ceux qui aident à construire Silent Flora contribuent à quelque chose de plus grand.",token_label:'Le Token',token_sub:"SFLR est le token utilitaire de Silent Flora. Gagné par le jeu, utilisé dans le jeu. Ce n'est pas un instrument financier.",token_btn:'Voir sur Polygonscan →',tok1:'Récompenses Joueurs',tok2:'Écosystème Jeu',tok3:'Accès Communauté',tok4:'Développement / Réserve',tok5:'Aucun ✓',notice_text:"SFLR est un token utilitaire pour le jeu. Pas un instrument financier. Aucun rendement n'est promis.",game_label:'Le Jeu',game_title:'Ce qui arrive\nquand on agit\n<em style="color:#4ecb82">sans réfléchir</em>',game_sub:'Silent Flora montre ce qui est en jeu — pas comme une leçon, mais comme une expérience.',game_btn:'Jeu bientôt disponible →',manifesto_quote:'"La blockchain n\'est pas pour les spéculateurs. Elle est pour tous. Silent Flora est le pont."',cta_title:'Prêt à\n<em>explorer?</em>',cta_sub:'Silent Flora est en développement. Suivez le voyage depuis le début.',cta_btn1:'Voir le Token',cta_btn2:'Le Jeu →',footer_overview:'Aperçu',roadmap_label:'Feuille de route',roadmap_title:'Le Voyage\n<em style="color:#4ecb82">à venir</em>',road_done:'✓ Terminé',road_now:'← Maintenant',road_plan:'Prévu',road1_phase:'Phase 1 — Q2 2026',road1_title:'Fondation',road1_1:'Prototype jouable',road1_2:'Token SFLR déployé',road1_3:'silentflora.io live',road1_4:'Aperçu publié',road2_phase:'Phase 2 — Q3 2026',road2_title:'Communauté',road2_1:'Lancement X et Discord',road2_2:'Première démo',road2_3:'Accès communauté',road2_4:'Structure légale',road3_phase:'Phase 3 — Q4 2026',road3_title:'Construction',road3_1:'Niveaux 1–3 complets',road3_2:'Mécaniques token',road3_3:'Subventions',road3_4:'Listing DEX',road4_phase:'Phase 4 — 2027',road4_title:'Lancement',road4_1:'Jeu complet (5 niveaux)',road4_2:'Version mobile',road4_3:'Version éducation',road4_4:'Gouvernance'},
-  es:{nav_game:'Juego',nav_learn:'Aprender',nav_token:'Token',nav_manifesto:'Manifiesto',nav_cta:'Explorar',hero_eyebrow:'Juego Narrativo — Blockchain — Red Polygon',hero_title2:'El Juego',hero_sub:'Un bosque silencioso. Cada decisión cambia el mundo. Experimenta blockchain sin saberlo.',hero_btn1:'Descubrir el Juego',hero_btn2:'Cómo funciona →',stat1:'Suministro Total',stat2:'Minería',stat3:'Métodos',stat4:'Niveles',pillars_label:'Cómo funciona',pillars_title:'Tres formas de\n<em style="color:#4ecb82">participar</em>',pillars_sub:'SFLR no se compra — se gana mediante participación genuina.',pillar1_text:'Juega, contribuye. SFLR se gana a través del gameplay y contribuciones creativas.',pillar2_text:'Arte, música, historias. La comunidad da forma al mundo juntos.',pillar3_text:'Pruebas, feedback, compartir. Quienes ayudan a construir Silent Flora contribuyen a algo más grande.',token_label:'El Token',token_sub:'SFLR es el token utilitario de Silent Flora. Se gana jugando y se usa dentro del juego. No es un instrumento financiero.',token_btn:'Ver en Polygonscan →',tok1:'Recompensas',tok2:'Ecosistema',tok3:'Acceso Comunidad',tok4:'Desarrollo / Reserva',tok5:'Ninguno ✓',notice_text:'SFLR es un token utilitario para el juego. No es un instrumento financiero.',game_label:'El Juego',game_title:'Qué pasa\ncuando actuamos\n<em style="color:#4ecb82">sin pensar</em>',game_sub:'Silent Flora muestra lo que está en juego — no como lección, sino como experiencia.',game_btn:'Juego próximamente →',manifesto_quote:'"Blockchain no es para especuladores. Es para todos. Silent Flora es el puente."',cta_title:'Listo para\n<em>explorar?</em>',cta_sub:'Silent Flora está en desarrollo. Sigue el viaje desde el principio.',cta_btn1:'Ver Token',cta_btn2:'El Juego →',footer_overview:'Resumen',roadmap_label:'Hoja de ruta',roadmap_title:'El Camino\n<em style="color:#4ecb82">adelante</em>',road_done:'✓ Completo',road_now:'← Ahora',road_plan:'Planificado',road1_phase:'Fase 1 — Q2 2026',road1_title:'Fundación',road1_1:'Prototipo jugable',road1_2:'Token SFLR desplegado',road1_3:'silentflora.io live',road1_4:'Resumen publicado',road2_phase:'Fase 2 — Q3 2026',road2_title:'Comunidad',road2_1:'Lanzamiento X y Discord',road2_2:'Primera demo',road2_3:'Acceso comunidad',road2_4:'Estructura legal',road3_phase:'Fase 3 — Q4 2026',road3_title:'Construcción',road3_1:'Niveles 1–3 completos',road3_2:'Mecánicas token',road3_3:'Subvenciones',road3_4:'Listing DEX',road4_phase:'Fase 4 — 2027',road4_title:'Lanzamiento',road4_1:'Juego completo (5 niveles)',road4_2:'Versión móvil',road4_3:'Versión educación',road4_4:'Gobernanza'},
-  zh:{nav_game:'游戏',nav_learn:'学习',nav_token:'代币',nav_manifesto:'宣言',nav_cta:'探索',hero_eyebrow:'叙事游戏 — 区块链 — Polygon 网络',hero_title2:'游戏',hero_sub:'一片寂静的森林。每个决定都会改变世界。在不知不觉中体验区块链。',hero_btn1:'发现游戏',hero_btn2:'如何运作 →',stat1:'总供应量',stat2:'需要挖矿',stat3:'参与方式',stat4:'学习关卡',pillars_label:'如何运作',pillars_title:'三种\n<em style="color:#4ecb82">参与</em>方式',pillars_sub:'SFLR不是购买的 — 而是通过真实参与获得的。',pillar1_text:'游戏、贡献。SFLR通过真实游戏和创意贡献获得。',pillar2_text:'艺术、音乐、故事。社区共同塑造世界。',pillar3_text:'测试、反馈、分享。帮助建设Silent Flora的人贡献于更大的事业。',token_label:'代币',token_sub:'SFLR是Silent Flora的实用代币。通过游戏获得，在游戏中使用。不是金融工具。',token_btn:'在Polygonscan查看 →',tok1:'玩家奖励',tok2:'游戏生态',tok3:'早期社区访问',tok4:'开发/储备',tok5:'无 ✓',notice_text:'SFLR是游戏实用代币。不是金融工具，不承诺任何财务回报。',game_label:'游戏',game_title:'当我们\n<em style="color:#4ecb82">不加思考</em>\n行动时会发生什么',game_sub:'Silent Flora展示了什么处于危险之中 — 体验，而非说教。',game_btn:'游戏即将推出 →',manifesto_quote:'"区块链不是为投机者准备的。它是为所有人准备的。Silent Flora是那座桥。"',cta_title:'准备好\n<em>探索了吗？</em>',cta_sub:'Silent Flora正在开发中。从一开始就跟随这段旅程。',cta_btn1:'查看代币',cta_btn2:'游戏 →',footer_overview:'项目概览',roadmap_label:'路线图',roadmap_title:'前方的\n<em style="color:#4ecb82">旅程</em>',road_done:'✓ 完成',road_now:'← 现在',road_plan:'计划中',road1_phase:'第1阶段 — Q2 2026',road1_title:'基础',road1_1:'可玩原型',road1_2:'SFLR代币部署',road1_3:'silentflora.io上线',road1_4:'项目概览发布',road2_phase:'第2阶段 — Q3 2026',road2_title:'社区',road2_1:'X和Discord启动',road2_2:'首个公开演示',road2_3:'早期社区访问',road2_4:'法律结构',road3_phase:'第3阶段 — Q4 2026',road3_title:'建设',road3_1:'完整游戏关卡1-3',road3_2:'游戏内代币机制',road3_3:'资助申请',road3_4:'DEX上市',road4_phase:'第4阶段 — 2027',road4_title:'发布',road4_1:'完整游戏（5关卡）',road4_2:'移动版本',road4_3:'教育版本',road4_4:'社区治理'},
-  ko:{nav_game:'게임',nav_learn:'배우기',nav_token:'토큰',nav_manifesto:'선언',nav_cta:'탐색',hero_eyebrow:'내러티브 게임 — 블록체인 — Polygon 네트워크',hero_title2:'게임',hero_sub:'조용한 숲. 모든 결정이 세상을 바꿉니다. 알지 못한 채 블록체인을 경험하세요.',hero_btn1:'게임 발견',hero_btn2:'작동 방식 →',stat1:'총 공급량',stat2:'채굴 필요',stat3:'참여 방법',stat4:'학습 레벨',pillars_label:'작동 방식',pillars_title:'세 가지\n<em style="color:#4ecb82">참여</em> 방법',pillars_sub:'SFLR은 구매하는 것이 아닙니다 — 진정한 참여를 통해 획득합니다.',pillar1_text:'게임을 플레이하고 기여하세요. SFLR은 진정한 게임플레이와 창의적 기여를 통해 획득됩니다.',pillar2_text:'예술, 음악, 이야기. 커뮤니티가 함께 세계를 만들어 갑니다.',pillar3_text:'테스트, 피드백, 공유. Silent Flora 구축을 돕는 사람들은 더 큰 것에 기여합니다.',token_label:'토큰',token_sub:'SFLR은 Silent Flora의 인게임 유틸리티 토큰입니다. 게임을 통해 획득하고 게임 세계 내에서 사용됩니다. 금융 상품이 아닙니다.',token_btn:'Polygonscan에서 보기 →',tok1:'플레이어 보상',tok2:'게임 생태계',tok3:'얼리 커뮤니티 접근',tok4:'개발 / 예비',tok5:'없음 ✓',notice_text:'SFLR은 게임 유틸리티 토큰입니다. 금융 상품이 아니며 재무적 수익을 약속하지 않습니다.',game_label:'게임',game_title:'생각 없이\n행동하면\n<em style="color:#4ecb82">어떻게 될까요</em>',game_sub:'Silent Flora는 무엇이 위태로운지 보여줍니다 — 경험으로.',game_btn:'게임 곧 출시 →',manifesto_quote:'"블록체인은 투기꾼을 위한 것이 아닙니다. 모두를 위한 것입니다. Silent Flora가 그 다리입니다."',cta_title:'탐색할\n<em>준비가 되셨나요?</em>',cta_sub:'Silent Flora는 개발 중입니다. 처음부터 커뮤니티의 일원이 되세요.',cta_btn1:'토큰 보기',cta_btn2:'게임 →',footer_overview:'프로젝트 개요',roadmap_label:'로드맵',roadmap_title:'앞으로의\n<em style="color:#4ecb82">여정</em>',road_done:'✓ 완료',road_now:'← 현재',road_plan:'계획됨',road1_phase:'1단계 — Q2 2026',road1_title:'기반',road1_1:'플레이 가능한 프로토타입',road1_2:'SFLR 토큰 배포',road1_3:'silentflora.io 출시',road1_4:'프로젝트 개요 발행',road2_phase:'2단계 — Q3 2026',road2_title:'커뮤니티',road2_1:'X 및 Discord 출시',road2_2:'첫 번째 공개 데모',road2_3:'얼리 커뮤니티 접근',road2_4:'법적 구조',road3_phase:'3단계 — Q4 2026',road3_title:'개발',road3_1:'전체 게임 레벨 1-3',road3_2:'게임 내 토큰 메커니즘',road3_3:'보조금 신청',road3_4:'DEX 상장',road4_phase:'4단계 — 2027',road4_title:'출시',road4_1:'완성된 게임 (5 레벨)',road4_2:'모바일 버전',road4_3:'교육 버전',road4_4:'커뮤니티 거버넌스'}
-};
+const T={en:{ng:'Game',nt:'Token',nr:'Roadmap',nm:'Manifesto',nc:'Explore',ey:'Narrative Game — Blockchain — Polygon Network',h2:'The Game',hs:'A quiet forest. Every decision changes the world. Discover blockchain through play — without knowing it.',b1:'Discover the Game',b2:'How it works →',s1:'Total Supply',s2:'Mining',s3:'Earn Methods',s4:'Phases',pl:'How it works',pt:'Three ways to <em>participate</em>',ps:'SFLR is not bought — it is earned through genuine participation in the Silent Flora world.',p1t:'Proof of <em>Play</em>',p1d:'Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions.',p2t:'Proof of <em>Creativity</em>',p2d:'Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised.',p3t:'Proof of <em>Impact</em>',p3d:'Testing, feedback, sharing. Those who help build Silent Flora contribute to something larger than the game.',tl:'The Token',ts:'SFLR is the in-game utility token of Silent Flora. Earned through play. Used within the game. Not a financial instrument — not a security. No return is promised or implied.',tb:'View on Polygonscan →',to1:'Player Rewards',to2:'Game Ecosystem',to3:'Early Community Access',to4:'Development / Reserve',to5:'None ✓',nt2:'SFLR is a utility token for the Silent Flora game. Not a financial instrument. No financial return is promised or implied. Early access is for active testers and contributors.',rl:'Roadmap',rt:'The Journey <em>ahead</em>',rd:'✓ Complete',rn:'← Now',rp:'Planned',r1p:'Phase 1 — Q2 2026',r1t:'Foundation',r1a:'Playable prototype',r1b:'SFLR token deployed',r1c:'silentflora.io live',r1d:'Project overview published',r2p:'Phase 2 — Q3 2026',r2t:'Community',r2a:'X and Discord launch',r2b:'First public demo',r2c:'Early community access',r2d:'Legal structure',r3p:'Phase 3 — Q4 2026',r3t:'Build',r3a:'Full game levels 1–3',r3b:'In-game token mechanics',r3c:'Grant applications',r3d:'DEX listing',r4p:'Phase 4 — 2027',r4t:'Launch',r4a:'Complete game (5 levels)',r4b:'Mobile version',r4c:'Education version',r4d:'Community governance',gl:'The Game',gt:'What happens when we act <em>without thinking</em>',gd:'A quiet forest. A wandering figure. Every decision leaves a mark. No violence. No rush. Only consequence.',gb:'Game coming soon →',mq:'"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."',ct:'Ready to <em>explore?</em>',cs:'Silent Flora is in development. Follow the journey from the beginning.',cb1:'View Token',cb2:'The Game →'},
+de:{ng:'Game',nt:'Token',nr:'Roadmap',nm:'Manifest',nc:'Entdecken',ey:'Narratives Spiel — Blockchain — Polygon Netzwerk',h2:'Das Spiel',hs:'Ein stiller Wald. Jede Entscheidung verändert die Welt. Blockchain erleben — ohne es zu wissen.',b1:'Das Spiel entdecken',b2:'Wie es funktioniert →',s1:'Gesamtangebot',s2:'Mining',s3:'Verdienst-Wege',s4:'Phasen',pl:'Wie es funktioniert',pt:'Drei Wege zur <em>Teilnahme</em>',ps:'SFLR wird nicht gekauft — er wird durch echte Teilnahme in der Silent Flora Welt verdient.',p1t:'Proof of <em>Play</em>',p1d:'Spiel das Spiel, trage zur Welt bei. SFLR wird durch Gameplay und kreative Beiträge verdient.',p2t:'Proof of <em>Creativity</em>',p2d:'Kunst, Musik, Geschichten, Ideen. Die Community gestaltet die Welt gemeinsam.',p3t:'Proof of <em>Impact</em>',p3d:'Testen, Feedback, Teilen. Wer Silent Flora aufbaut, trägt zu etwas Grösserem bei.',tl:'Der Token',ts:'SFLR ist der In-Game Utility Token von Silent Flora. Durch Spielen verdient. In der Spielwelt verwendet. Kein Finanzinstrument — kein Wertpapier. Keine Rendite wird versprochen.',tb:'Auf Polygonscan ansehen →',to1:'Spieler Belohnungen',to2:'Spiel Ökosystem',to3:'Früher Community-Zugang',to4:'Entwicklung / Reserve',to5:'Keins ✓',nt2:'SFLR ist ein Utility Token für das Silent Flora Spiel. Kein Finanzinstrument. Keine Rendite wird versprochen. Früher Zugang ist für aktive Tester und Mitwirkende.',rl:'Roadmap',rt:'Die Reise <em>voraus</em>',rd:'✓ Abgeschlossen',rn:'← Jetzt',rp:'Geplant',r1p:'Phase 1 — Q2 2026',r1t:'Fundament',r1a:'Spielbarer Prototyp',r1b:'SFLR Token deployed',r1c:'silentflora.io live',r1d:'Projektübersicht veröffentlicht',r2p:'Phase 2 — Q3 2026',r2t:'Community',r2a:'X und Discord Launch',r2b:'Erste öffentliche Demo',r2c:'Früher Community-Zugang',r2d:'Rechtliche Struktur',r3p:'Phase 3 — Q4 2026',r3t:'Aufbau',r3a:'Vollständige Level 1–3',r3b:'In-Game Token Mechaniken',r3c:'Grant-Anträge',r3d:'DEX Listing',r4p:'Phase 4 — 2027',r4t:'Launch',r4a:'Vollständiges Spiel (5 Level)',r4b:'Mobile Version',r4c:'Education Version',r4d:'Community Governance',gl:'Das Spiel',gt:'Was passiert wenn wir <em>ohne Nachdenken</em> handeln',gd:'Ein stiller Wald. Eine wandernde Figur. Jede Entscheidung hinterlässt eine Spur. Keine Gewalt. Keine Hektik.',gb:'Game coming soon →',mq:'"Blockchain ist nicht für Spekulanten. Sie ist für alle. Silent Flora ist die Brücke."',ct:'Bereit zum <em>Entdecken?</em>',cs:'Silent Flora ist in Entwicklung. Begleite die Reise von Anfang an.',cb1:'Token ansehen',cb2:'Das Spiel →'},
+fr:{ng:'Jeu',nt:'Token',nr:'Feuille de route',nm:'Manifeste',nc:'Explorer',ey:'Jeu Narratif — Blockchain — Réseau Polygon',h2:'Le Jeu',hs:"Une forêt silencieuse. Chaque décision change le monde. Découvrez la blockchain sans le savoir.",b1:'Découvrir le Jeu',b2:'Comment ça marche →',s1:'Offre Totale',s2:'Minage',s3:'Méthodes',s4:'Phases',pl:'Comment ça marche',pt:'Trois façons de <em>participer</em>',ps:"SFLR ne s'achète pas — il se gagne par une participation authentique.",p1t:'Proof of <em>Play</em>',p1d:'Jouez, contribuez. SFLR est gagné par le gameplay et les contributions créatives.',p2t:'Proof of <em>Creativity</em>',p2d:'Art, musique, histoires. La communauté façonne le monde ensemble.',p3t:'Proof of <em>Impact</em>',p3d:"Tests, retours, partage. Ceux qui construisent Silent Flora contribuent à quelque chose de plus grand.",tl:'Le Token',ts:"SFLR est le token utilitaire de Silent Flora. Gagné par le jeu. Pas un instrument financier.",tb:'Voir sur Polygonscan →',to1:'Récompenses',to2:'Écosystème',to3:'Accès Communauté',to4:'Développement / Réserve',to5:'Aucun ✓',nt2:"SFLR est un token utilitaire. Pas un instrument financier. Aucun rendement n'est promis.",rl:'Feuille de route',rt:'Le Voyage <em>à venir</em>',rd:'✓ Terminé',rn:'← Maintenant',rp:'Prévu',r1p:'Phase 1 — Q2 2026',r1t:'Fondation',r1a:'Prototype jouable',r1b:'Token SFLR déployé',r1c:'silentflora.io live',r1d:'Aperçu publié',r2p:'Phase 2 — Q3 2026',r2t:'Communauté',r2a:'Lancement X et Discord',r2b:'Première démo',r2c:'Accès communauté',r2d:'Structure légale',r3p:'Phase 3 — Q4 2026',r3t:'Construction',r3a:'Niveaux 1–3 complets',r3b:'Mécaniques token',r3c:'Subventions',r3d:'Listing DEX',r4p:'Phase 4 — 2027',r4t:'Lancement',r4a:'Jeu complet (5 niveaux)',r4b:'Version mobile',r4c:'Version éducation',r4d:'Gouvernance',gl:'Le Jeu',gt:'Ce qui arrive quand on agit <em>sans réfléchir</em>',gd:'Une forêt silencieuse. Une figure errante. Chaque décision laisse une trace.',gb:'Jeu bientôt →',mq:'"La blockchain n\'est pas pour les spéculateurs. Elle est pour tous. Silent Flora est le pont."',ct:'Prêt à <em>explorer?</em>',cs:'Silent Flora est en développement. Suivez le voyage depuis le début.',cb1:'Voir le Token',cb2:'Le Jeu →'},
+es:{ng:'Juego',nt:'Token',nr:'Hoja de ruta',nm:'Manifiesto',nc:'Explorar',ey:'Juego Narrativo — Blockchain — Red Polygon',h2:'El Juego',hs:'Un bosque silencioso. Cada decisión cambia el mundo. Experimenta blockchain sin saberlo.',b1:'Descubrir el Juego',b2:'Cómo funciona →',s1:'Suministro Total',s2:'Minería',s3:'Métodos',s4:'Fases',pl:'Cómo funciona',pt:'Tres formas de <em>participar</em>',ps:'SFLR no se compra — se gana mediante participación genuina.',p1t:'Proof of <em>Play</em>',p1d:'Juega, contribuye. SFLR se gana a través del gameplay y contribuciones creativas.',p2t:'Proof of <em>Creativity</em>',p2d:'Arte, música, historias. La comunidad da forma al mundo juntos.',p3t:'Proof of <em>Impact</em>',p3d:'Pruebas, feedback, compartir. Quienes construyen Silent Flora contribuyen a algo más grande.',tl:'El Token',ts:'SFLR es el token utilitario de Silent Flora. Se gana jugando. No es un instrumento financiero.',tb:'Ver en Polygonscan →',to1:'Recompensas',to2:'Ecosistema',to3:'Acceso Comunidad',to4:'Desarrollo / Reserva',to5:'Ninguno ✓',nt2:'SFLR es un token utilitario. No es un instrumento financiero. No se promete ningún rendimiento.',rl:'Hoja de ruta',rt:'El Camino <em>adelante</em>',rd:'✓ Completo',rn:'← Ahora',rp:'Planificado',r1p:'Fase 1 — Q2 2026',r1t:'Fundación',r1a:'Prototipo jugable',r1b:'Token SFLR desplegado',r1c:'silentflora.io live',r1d:'Resumen publicado',r2p:'Fase 2 — Q3 2026',r2t:'Comunidad',r2a:'Lanzamiento X y Discord',r2b:'Primera demo',r2c:'Acceso comunidad',r2d:'Estructura legal',r3p:'Fase 3 — Q4 2026',r3t:'Construcción',r3a:'Niveles 1–3 completos',r3b:'Mecánicas token',r3c:'Subvenciones',r3d:'Listing DEX',r4p:'Fase 4 — 2027',r4t:'Lanzamiento',r4a:'Juego completo (5 niveles)',r4b:'Versión móvil',r4c:'Versión educación',r4d:'Gobernanza',gl:'El Juego',gt:'Qué pasa cuando actuamos <em>sin pensar</em>',gd:'Un bosque silencioso. Una figura errante. Cada decisión deja una huella.',gb:'Juego próximamente →',mq:'"Blockchain no es para especuladores. Es para todos. Silent Flora es el puente."',ct:'Listo para <em>explorar?</em>',cs:'Silent Flora está en desarrollo. Sigue el viaje desde el principio.',cb1:'Ver Token',cb2:'El Juego →'},
+zh:{ng:'游戏',nt:'代币',nr:'路线图',nm:'宣言',nc:'探索',ey:'叙事游戏 — 区块链 — Polygon 网络',h2:'游戏',hs:'一片寂静的森林。每个决定都会改变世界。在不知不觉中体验区块链。',b1:'发现游戏',b2:'如何运作 →',s1:'总供应量',s2:'挖矿',s3:'参与方式',s4:'阶段',pl:'如何运作',pt:'三种 <em>参与</em>方式',ps:'SFLR不是购买的 — 而是通过真实参与获得的。',p1t:'Proof of <em>Play</em>',p1d:'游戏、贡献。SFLR通过真实游戏和创意贡献获得。',p2t:'Proof of <em>Creativity</em>',p2d:'艺术、音乐、故事。社区共同塑造世界。',p3t:'Proof of <em>Impact</em>',p3d:'测试、反馈、分享。帮助建设Silent Flora的人贡献于更大的事业。',tl:'代币',ts:'SFLR是Silent Flora的实用代币。通过游戏获得。在游戏中使用。不是金融工具。',tb:'在Polygonscan查看 →',to1:'玩家奖励',to2:'游戏生态',to3:'早期社区访问',to4:'开发/储备',to5:'无 ✓',nt2:'SFLR是游戏实用代币。不是金融工具，不承诺任何财务回报。',rl:'路线图',rt:'前方的 <em>旅程</em>',rd:'✓ 完成',rn:'← 现在',rp:'计划中',r1p:'第1阶段 — Q2 2026',r1t:'基础',r1a:'可玩原型',r1b:'SFLR代币部署',r1c:'silentflora.io上线',r1d:'项目概览发布',r2p:'第2阶段 — Q3 2026',r2t:'社区',r2a:'X和Discord启动',r2b:'首个公开演示',r2c:'早期社区访问',r2d:'法律结构',r3p:'第3阶段 — Q4 2026',r3t:'建设',r3a:'完整游戏关卡1-3',r3b:'游戏内代币机制',r3c:'资助申请',r3d:'DEX上市',r4p:'第4阶段 — 2027',r4t:'发布',r4a:'完整游戏（5关卡）',r4b:'移动版本',r4c:'教育版本',r4d:'社区治理',gl:'游戏',gt:'当我们 <em>不加思考</em>行动时会发生什么',gd:'一片寂静的森林。一个流浪的身影。每个决定都留下印记。',gb:'游戏即将推出 →',mq:'"区块链不是为投机者准备的。它是为所有人准备的。Silent Flora是那座桥。"',ct:'准备好 <em>探索了吗？</em>',cs:'Silent Flora正在开发中。从一开始就跟随这段旅程。',cb1:'查看代币',cb2:'游戏 →'},
+ko:{ng:'게임',nt:'토큰',nr:'로드맵',nm:'선언',nc:'탐색',ey:'내러티브 게임 — 블록체인 — Polygon 네트워크',h2:'게임',hs:'조용한 숲. 모든 결정이 세상을 바꿉니다. 알지 못한 채 블록체인을 경험하세요.',b1:'게임 발견',b2:'작동 방식 →',s1:'총 공급량',s2:'채굴',s3:'참여 방법',s4:'단계',pl:'작동 방식',pt:'세 가지 <em>참여</em> 방법',ps:'SFLR은 구매하는 것이 아닙니다 — 진정한 참여를 통해 획득합니다.',p1t:'Proof of <em>Play</em>',p1d:'게임을 플레이하고 기여하세요. SFLR은 게임플레이와 창의적 기여를 통해 획득됩니다.',p2t:'Proof of <em>Creativity</em>',p2d:'예술, 음악, 이야기. 커뮤니티가 함께 세계를 만들어 갑니다.',p3t:'Proof of <em>Impact</em>',p3d:'테스트, 피드백, 공유. Silent Flora 구축을 돕는 사람들은 더 큰 것에 기여합니다.',tl:'토큰',ts:'SFLR은 Silent Flora의 인게임 유틸리티 토큰입니다. 게임을 통해 획득. 게임 세계 내에서 사용. 금융 상품이 아닙니다.',tb:'Polygonscan에서 보기 →',to1:'플레이어 보상',to2:'게임 생태계',to3:'얼리 커뮤니티 접근',to4:'개발 / 예비',to5:'없음 ✓',nt2:'SFLR은 게임 유틸리티 토큰입니다. 금융 상품이 아니며 재무적 수익을 약속하지 않습니다.',rl:'로드맵',rt:'앞으로의 <em>여정</em>',rd:'✓ 완료',rn:'← 현재',rp:'계획됨',r1p:'1단계 — Q2 2026',r1t:'기반',r1a:'플레이 가능한 프로토타입',r1b:'SFLR 토큰 배포',r1c:'silentflora.io 출시',r1d:'프로젝트 개요 발행',r2p:'2단계 — Q3 2026',r2t:'커뮤니티',r2a:'X 및 Discord 출시',r2b:'첫 번째 공개 데모',r2c:'얼리 커뮤니티 접근',r2d:'법적 구조',r3p:'3단계 — Q4 2026',r3t:'개발',r3a:'전체 게임 레벨 1-3',r3b:'게임 내 토큰 메커니즘',r3c:'보조금 신청',r3d:'DEX 상장',r4p:'4단계 — 2027',r4t:'출시',r4a:'완성된 게임 (5 레벨)',r4b:'모바일 버전',r4c:'교육 버전',r4d:'커뮤니티 거버넌스',gl:'게임',gt:'생각 없이 행동하면 <em>어떻게 될까요</em>',gd:'조용한 숲. 떠도는 인물. 모든 결정이 흔적을 남깁니다.',gb:'게임 곧 출시 →',mq:'"블록체인은 투기꾼을 위한 것이 아닙니다. 모두를 위한 것입니다. Silent Flora가 그 다리입니다."',ct:'탐색할 <em>준비가 되셨나요?</em>',cs:'Silent Flora는 개발 중입니다. 처음부터 커뮤니티의 일원이 되세요.',cb1:'토큰 보기',cb2:'게임 →'}};
 
-function setLang(lang) {
-  const t = i18n_data[lang];
-  if (!t) return;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key] !== undefined) el.innerHTML = t[key].replace(/\n/g,'<br>');
+function setLang(l){
+  var t=T[l]; if(!t) return;
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    var k=el.getAttribute('data-t');
+    if(t[k]!==undefined) el.innerHTML=t[k];
   });
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active',
-      btn.textContent.toLowerCase()===lang ||
-      (lang==='zh'&&btn.textContent==='中文') ||
-      (lang==='ko'&&btn.textContent==='한국어')
-    );
+  document.querySelectorAll('.lb').forEach(function(b){
+    b.classList.toggle('active', b.dataset.l===l);
   });
-  document.documentElement.lang = lang;
+  document.documentElement.lang=l;
 }
 </script>
 
-<!-- LANGUAGE BAR -->
-<div class="lang-bar">
-  <button class="lang-btn active" onclick="setLang('en')">EN</button>
-  <button class="lang-btn" onclick="setLang('de')">DE</button>
-  <button class="lang-btn" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn" onclick="setLang('es')">ES</button>
-  <button class="lang-btn" onclick="setLang('zh')">中文</button>
-  <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+<style>
+:root{--bk:#050507;--dp:#0a0a0f;--sf:#111118;--cd:#16161f;--gd:#0d3320;--g:#2d9e5f;--gl:#4ecb82;--gg:rgba(45,158,95,.15);--am:#c8922a;--tx:#e8e4d9;--mt:#7a7870;--dm:#3a3832;--bd:rgba(255,255,255,.06);--bg:rgba(45,158,95,.25)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bk);color:var(--tx);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;cursor:none}
+.cur{position:fixed;width:8px;height:8px;background:var(--gl);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .1s;mix-blend-mode:screen}
+.cur-r{position:fixed;width:32px;height:32px;border:1px solid rgba(78,203,130,.4);border-radius:50%;pointer-events:none;z-index:9998;transition:all .15s}
+.lbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(5,5,7,.95);border-bottom:1px solid var(--bd);padding:8px 48px;display:flex;justify-content:flex-end;gap:4px;backdrop-filter:blur(8px)}
+.lb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mt);background:transparent;border:1px solid transparent;padding:4px 10px;cursor:none;text-transform:uppercase;transition:all .2s}
+.lb:hover,.lb.active{color:var(--gl);border-color:var(--bg);background:var(--gg)}
+nav{position:fixed;top:33px;left:0;right:0;z-index:100;padding:20px 48px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(5,5,7,.9),transparent);backdrop-filter:blur(8px)}
+.nl{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.2em;color:var(--gl)}
+nav ul{display:flex;gap:40px;list-style:none}
+nav ul a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--mt);text-decoration:none;text-transform:uppercase;transition:color .3s}
+nav ul a:hover{color:var(--gl)}
+.nc{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gl);border:1px solid var(--bg);padding:10px 20px;text-decoration:none;text-transform:uppercase;transition:all .3s}
+.nc:hover{background:var(--gg)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:160px 48px 80px;position:relative;overflow:hidden}
+.hbg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 50%,rgba(13,51,32,.4) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 20% 80%,rgba(45,158,95,.08) 0%,transparent 60%)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:of 12s ease-in-out infinite;pointer-events:none}
+.o1{width:500px;height:500px;background:radial-gradient(circle,rgba(45,158,95,.12),transparent 70%);right:-100px;top:10%}
+.o2{width:300px;height:300px;background:radial-gradient(circle,rgba(13,51,32,.3),transparent 70%);left:10%;bottom:20%;animation-delay:-4s}
+.o3{width:200px;height:200px;background:radial-gradient(circle,rgba(78,203,130,.06),transparent 70%);right:30%;top:30%;animation-delay:-8s}
+@keyframes of{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.95)}}
+.hc{position:relative;z-index:2;max-width:900px}
+.hey{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--g);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fu 1s ease .3s forwards}
+.ht1{font-size:clamp(64px,10vw,140px);font-weight:300;line-height:.9;letter-spacing:-.02em;margin-bottom:8px;opacity:0;animation:fu 1s ease .5s forwards}
+.ht1 em{font-style:italic;color:var(--gl)}
+.ht2{font-size:clamp(64px,10vw,140px);font-weight:300;line-height:.9;letter-spacing:-.02em;color:var(--dm);margin-bottom:48px;opacity:0;animation:fu 1s ease .7s forwards}
+.hsub{font-size:20px;font-weight:300;line-height:1.7;color:var(--mt);max-width:560px;margin-bottom:56px;opacity:0;animation:fu 1s ease .9s forwards}
+.ha{display:flex;gap:20px;align-items:center;opacity:0;animation:fu 1s ease 1.1s forwards}
+.bp{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--bk);background:var(--gl);padding:16px 32px;text-decoration:none;transition:all .3s;cursor:none;display:inline-block}
+.bp:hover{background:var(--g);transform:translateY(-2px)}
+.bs{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .3s}
+.bs:hover{color:var(--gl)}
+.eb{position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:2;opacity:0;animation:fi 1.5s ease 1.5s forwards}
+.ero{width:300px;height:300px;position:relative;display:flex;align-items:center;justify-content:center}
+.ering{position:absolute;inset:0;border-radius:50%;border:1px solid var(--bg);animation:sp 20s linear infinite}
+.ering::before{content:'';position:absolute;inset:-1px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0%,var(--g) 8%,transparent 16%);animation:sp 3s linear infinite;-webkit-mask:radial-gradient(circle at center,transparent 48%,black 49%)}
+.ed{position:absolute;width:6px;height:6px;background:var(--gl);border-radius:50%;top:-3px;left:calc(50% - 3px);transform-origin:3px 153px;box-shadow:0 0 8px var(--gl)}
+.ed:nth-child(2){animation:sp 20s linear infinite}
+.ed:nth-child(3){animation:sp 20s linear infinite;animation-delay:-6.6s}
+.ed:nth-child(4){animation:sp 20s linear infinite;animation-delay:-13.3s}
+.eri{width:220px;height:220px;border-radius:50%;border:1px solid rgba(78,203,130,.15);display:flex;align-items:center;justify-content:center;animation:sr 40s linear infinite}
+#ec{width:160px!important;height:160px!important;border-radius:50%;box-shadow:0 0 40px rgba(45,158,95,.3),0 0 80px rgba(45,158,95,.1)}
+.etl{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.ets{font-family:'Space Mono',monospace;font-size:14px;color:var(--gl);letter-spacing:.3em}
+.etn{font-family:'Space Mono',monospace;font-size:9px;color:var(--mt);letter-spacing:.2em;text-transform:uppercase}
+@keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes sr{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+.sb{position:relative;z-index:2;border-top:1px solid var(--bd);padding:32px 48px;display:grid;grid-template-columns:repeat(4,1fr);opacity:0;animation:fu 1s ease 1.3s forwards}
+.st{padding:0 32px;border-right:1px solid var(--bd)}
+.st:first-child{padding-left:0}
+.st:last-child{border-right:none}
+.sv{font-size:36px;font-weight:300;color:var(--tx);letter-spacing:-.02em}
+.sv span{color:var(--gl)}
+.sl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;margin-top:4px}
+section{padding:120px 48px;position:relative}
+.slb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:var(--g);text-transform:uppercase;margin-bottom:16px}
+.stl{font-size:clamp(40px,6vw,80px);font-weight:300;line-height:1.05;letter-spacing:-.02em;margin-bottom:24px}
+.stl em,.stl2 em{font-style:italic;color:var(--gl)}
+.ssu{font-size:18px;font-weight:300;color:var(--mt);line-height:1.8;max-width:560px;margin-bottom:64px}
+.pill{background:var(--dp)}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);margin-top:64px}
+.pc{background:var(--cd);padding:48px 40px;position:relative;overflow:hidden;transition:background .4s}
+.pc::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--g);transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.pc:hover{background:var(--sf)}
+.pc:hover::before{transform:scaleX(1)}
+.pnum{font-family:'Space Mono',monospace;font-size:11px;color:var(--dm);letter-spacing:.2em;margin-bottom:32px}
+.pico{font-size:40px;margin-bottom:24px}
+.ptit{font-size:28px;font-weight:400;margin-bottom:16px}
+.ptit em{font-style:italic;color:var(--gl)}
+.pdesc{font-size:16px;font-weight:300;color:var(--mt);line-height:1.8}
+.rm{background:var(--dp)}
+.rg{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);margin-top:64px}
+.rc{background:var(--cd);padding:40px 32px;position:relative;transition:background .3s}
+.rc:hover{background:var(--sf)}
+.rc.done{border-top:2px solid var(--gl)}
+.rc.now{border-top:2px solid var(--am)}
+.rc.plan{border-top:2px solid var(--dm)}
+.rph{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;margin-bottom:8px}
+.rs{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:3px 8px;margin-bottom:20px}
+.rs.d{color:var(--gl);background:rgba(78,203,130,.1);border:1px solid rgba(78,203,130,.3)}
+.rs.n{color:var(--am);background:rgba(200,146,42,.1);border:1px solid rgba(200,146,42,.3)}
+.rs.p{color:var(--mt);background:rgba(255,255,255,.03);border:1px solid var(--bd)}
+.rtit{font-size:22px;font-weight:300;color:var(--tx);margin-bottom:16px}
+.rlist{list-style:none;display:flex;flex-direction:column;gap:8px}
+.rlist li{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--mt);padding-left:16px;position:relative}
+.rlist li::before{content:'—';position:absolute;left:0;color:var(--gd)}
+.tok{background:var(--dp);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.tinfo h2{font-size:clamp(40px,5vw,72px);font-weight:300;line-height:1.05;margin-bottom:24px}
+.tinfo h2 em{font-style:italic;color:var(--gl)}
+.tinfo p{font-size:18px;font-weight:300;color:var(--mt);line-height:1.8;margin-bottom:40px}
+.tadr{font-family:'Space Mono',monospace;font-size:11px;color:var(--mt);background:var(--sf);border:1px solid var(--bd);padding:16px 20px;letter-spacing:.05em;margin-bottom:32px;word-break:break-all;line-height:1.6}
+.tadr span{display:block;font-size:9px;letter-spacing:.2em;color:var(--g);text-transform:uppercase;margin-bottom:8px}
+.toks{display:flex;flex-direction:column;border:1px solid var(--bd)}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--bd);transition:background .2s}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--sf)}
+.trl{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--mt);text-transform:uppercase}
+.trv{font-size:20px;font-weight:300;color:var(--tx)}
+.trv.g{color:var(--gl)}
+.nb{background:rgba(45,158,95,.06);border-top:1px solid var(--bg);border-bottom:1px solid var(--bg);padding:20px 48px;text-align:center}
+.nb p{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mt);line-height:1.7}
+.gmsec{background:var(--bk)}
+.gi{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.gframe{aspect-ratio:1;border:1px solid var(--bg);background:var(--cd);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.gframe::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(45,158,95,.15),transparent 50%),radial-gradient(ellipse at 70% 70%,rgba(13,51,32,.3),transparent 50%)}
+.gph{font-size:100px;opacity:.2;z-index:1}
+.glbl{position:absolute;bottom:20px;left:20px;right:20px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--g);text-transform:uppercase}
+.gcr{position:absolute;width:20px;height:20px;border-color:var(--g);border-style:solid}
+.gcr.tl{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.gcr.tr{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.gcr.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px}
+.gcr.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.mfsec{background:var(--gd);border-top:1px solid var(--bg);border-bottom:1px solid var(--bg);text-align:center;padding:120px 48px}
+.mqt{font-size:clamp(24px,3.5vw,48px);font-weight:300;font-style:italic;line-height:1.5;max-width:860px;margin:0 auto 32px;color:var(--tx)}
+.mat{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--gl);text-transform:uppercase}
+.ctasec{background:var(--bk);text-align:center;padding:160px 48px}
+.ctasec h2{font-size:clamp(48px,8vw,100px);font-weight:300;line-height:1.0;margin-bottom:32px}
+.ctasec h2 em{font-style:italic;color:var(--gl)}
+.ctasec p{font-size:18px;color:var(--mt);margin-bottom:48px;font-weight:300}
+.ca{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+footer{border-top:1px solid var(--bd);padding:40px 48px;display:flex;justify-content:space-between;align-items:center}
+.flog{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.2em;color:var(--gl)}
+.ftxt{font-family:'Space Mono',monospace;font-size:10px;color:var(--dm);letter-spacing:.1em}
+.flnks{display:flex;gap:32px}
+.flnks a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mt);text-decoration:none;text-transform:uppercase;transition:color .3s}
+.flnks a:hover{color:var(--gl)}
+@keyframes fu{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.rv.vis{opacity:1;transform:translateY(0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bk)}::-webkit-scrollbar-thumb{background:var(--gd)}
+@media(max-width:900px){
+  .lbar{padding:8px 16px}.hero{padding:140px 24px 60px}.eb{display:none}
+  .sb{grid-template-columns:repeat(2,1fr);padding:24px}
+  section{padding:80px 24px}
+  nav{padding:20px 24px;top:33px}nav ul{display:none}
+  .pg,.rg,.tgrid,.gi{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:20px;text-align:center}.nb{padding:16px 24px}
+}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curr"></div>
+
+<div class="lbar">
+  <button class="lb active" data-l="en" onclick="setLang('en')">EN</button>
+  <button class="lb" data-l="de" onclick="setLang('de')">DE</button>
+  <button class="lb" data-l="fr" onclick="setLang('fr')">FR</button>
+  <button class="lb" data-l="es" onclick="setLang('es')">ES</button>
+  <button class="lb" data-l="zh" onclick="setLang('zh')">中文</button>
+  <button class="lb" data-l="ko" onclick="setLang('ko')">한국어</button>
 </div>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
-  <ul class="nav-links">
-    <li><a href="#game" data-i18n="nav_game">Game</a></li>
-    <li><a href="#learn" data-i18n="nav_learn">Learn</a></li>
-    <li><a href="#token" data-i18n="nav_token">Token</a></li>
-    <li><a href="#manifesto" data-i18n="nav_manifesto">Manifesto</a></li>
+  <div class="nl">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
+  <ul>
+    <li><a href="#game" data-t="ng">Game</a></li>
+    <li><a href="#token" data-t="nt">Token</a></li>
+    <li><a href="#roadmap" data-t="nr">Roadmap</a></li>
+    <li><a href="#manifesto" data-t="nm">Manifesto</a></li>
   </ul>
-  <a href="#learn" class="nav-cta" data-i18n="nav_cta">Explore</a>
+  <a href="#game" class="nc" data-t="nc">Explore</a>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <div class="hero-content">
-    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Narrative Game — Blockchain — Polygon Network</p>
-    <h1 class="hero-title">Silent<em>Flora</em></h1>
-    <h2 class="hero-title-2" data-i18n="hero_title2">The Game</h2>
-    <p class="hero-sub" data-i18n="hero_sub">A quiet forest. Every decision changes the world. Experience blockchain without knowing it — through play, reflection and consequence.</p>
-    <div class="hero-actions">
-      <a href="#game" class="btn-primary" data-i18n="hero_btn1">Discover the Game</a>
-      <a href="#learn" class="btn-secondary" data-i18n="hero_btn2">How it works →</a>
+  <div class="hbg"></div>
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="hc">
+    <p class="hey" data-t="ey">Narrative Game — Blockchain — Polygon Network</p>
+    <h1 class="ht1">Silent<em>Flora</em></h1>
+    <h2 class="ht2" data-t="h2">The Game</h2>
+    <p class="hsub" data-t="hs">A quiet forest. Every decision changes the world.</p>
+    <div class="ha">
+      <a href="#game" class="bp" data-t="b1">Discover the Game</a>
+      <a href="#token" class="bs" data-t="b2">How it works →</a>
     </div>
   </div>
-
-  <!-- EARTH BADGE -->
-  <div class="token-badge">
-    <div class="token-ring-outer">
-      <div class="ring-orbit">
-        <div class="orbit-dot"></div>
-        <div class="orbit-dot"></div>
-        <div class="orbit-dot"></div>
-      </div>
-      <div class="ring-inner">
-        <canvas id="earth-canvas"></canvas>
-      </div>
+  <div class="eb">
+    <div class="ero">
+      <div class="ering"><div class="ed"></div><div class="ed"></div><div class="ed"></div></div>
+      <div class="eri"><canvas id="ec"></canvas></div>
     </div>
-    <div class="token-label">
-      <div class="token-label-sym">SFLR</div>
-      <div class="token-label-net">Polygon Mainnet</div>
-    </div>
+    <div class="etl"><div class="ets">SFLR</div><div class="etn">Polygon Mainnet</div></div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stat"><div class="stat-value">100<span>M</span></div><div class="stat-label" data-i18n="stat1">Total Supply</div></div>
-  <div class="stat"><div class="stat-value">0<span>%</span></div><div class="stat-label" data-i18n="stat2">Mining Required</div></div>
-  <div class="stat"><div class="stat-value">3</div><div class="stat-label" data-i18n="stat3">Earn Methods</div></div>
-  <div class="stat"><div class="stat-value">5</div><div class="stat-label" data-i18n="stat4">Learning Levels</div></div>
+<div class="sb">
+  <div class="st"><div class="sv">100<span>M</span></div><div class="sl" data-t="s1">Total Supply</div></div>
+  <div class="st"><div class="sv">0<span>%</span></div><div class="sl" data-t="s2">Mining</div></div>
+  <div class="st"><div class="sv">3</div><div class="sl" data-t="s3">Earn Methods</div></div>
+  <div class="st"><div class="sv">4</div><div class="sl" data-t="s4">Phases</div></div>
 </div>
 
-<!-- PILLARS / HOW YOU PARTICIPATE -->
-<section class="pillars" id="ecosystem">
-  <div class="reveal">
-    <p class="section-label" data-i18n="pillars_label">How it works</p>
-    <h2 class="section-title" data-i18n="pillars_title">Three ways to<br><em style="font-style:italic;color:#4ecb82">participate</em></h2>
-    <p class="section-sub" data-i18n="pillars_sub">SFLR is not bought — it is earned through genuine participation in the Silent Flora world.</p>
+<section class="pill" id="ecosystem">
+  <div class="rv">
+    <p class="slb" data-t="pl">How it works</p>
+    <h2 class="stl" data-t="pt">Three ways to <em>participate</em></h2>
+    <p class="ssu" data-t="ps">SFLR is not bought — it is earned through genuine participation.</p>
   </div>
-  <div class="pillars-grid reveal">
-    <div class="pillar">
-      <div class="pillar-number">01 —</div>
-      <div class="pillar-icon">🎮</div>
-      <h3 class="pillar-title">Proof of <em>Play</em></h3>
-      <p class="pillar-text" data-i18n="pillar1_text">Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions to the Silent Flora ecosystem.</p>
+  <div class="pg rv">
+    <div class="pc"><div class="pnum">01 —</div><div class="pico">🎮</div><h3 class="ptit" data-t="p1t">Proof of <em>Play</em></h3><p class="pdesc" data-t="p1d">Play the game, contribute to the world.</p></div>
+    <div class="pc"><div class="pnum">02 —</div><div class="pico">🎨</div><h3 class="ptit" data-t="p2t">Proof of <em>Creativity</em></h3><p class="pdesc" data-t="p2d">Art, music, stories, ideas.</p></div>
+    <div class="pc"><div class="pnum">03 —</div><div class="pico">🌱</div><h3 class="ptit" data-t="p3t">Proof of <em>Impact</em></h3><p class="pdesc" data-t="p3d">Testing, feedback, sharing.</p></div>
+  </div>
+</section>
+
+<section class="rm" id="roadmap">
+  <div class="rv">
+    <p class="slb" data-t="rl">Roadmap</p>
+    <h2 class="stl" data-t="rt">The Journey <em>ahead</em></h2>
+  </div>
+  <div class="rg rv">
+    <div class="rc done">
+      <div class="rph" data-t="r1p">Phase 1 — Q2 2026</div>
+      <div class="rs d" data-t="rd">✓ Complete</div>
+      <div class="rtit" data-t="r1t">Foundation</div>
+      <ul class="rlist"><li data-t="r1a">Playable prototype</li><li data-t="r1b">SFLR token deployed</li><li data-t="r1c">silentflora.io live</li><li data-t="r1d">Project overview published</li></ul>
     </div>
-    <div class="pillar">
-      <div class="pillar-number">02 —</div>
-      <div class="pillar-icon">🎨</div>
-      <h3 class="pillar-title">Proof of <em>Creativity</em></h3>
-      <p class="pillar-text" data-i18n="pillar2_text">Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised with SFLR.</p>
+    <div class="rc now">
+      <div class="rph" data-t="r2p">Phase 2 — Q3 2026</div>
+      <div class="rs n" data-t="rn">← Now</div>
+      <div class="rtit" data-t="r2t">Community</div>
+      <ul class="rlist"><li data-t="r2a">X and Discord launch</li><li data-t="r2b">First public demo</li><li data-t="r2c">Early community access</li><li data-t="r2d">Legal structure</li></ul>
     </div>
-    <div class="pillar">
-      <div class="pillar-number">03 —</div>
-      <div class="pillar-icon">🌱</div>
-      <h3 class="pillar-title">Proof of <em>Impact</em></h3>
-      <p class="pillar-text" data-i18n="pillar3_text">Testing, feedback, sharing. Those who help build the Silent Flora community contribute to something larger than the game itself.</p>
+    <div class="rc plan">
+      <div class="rph" data-t="r3p">Phase 3 — Q4 2026</div>
+      <div class="rs p" data-t="rp">Planned</div>
+      <div class="rtit" data-t="r3t">Build</div>
+      <ul class="rlist"><li data-t="r3a">Full game levels 1–3</li><li data-t="r3b">In-game token mechanics</li><li data-t="r3c">Grant applications</li><li data-t="r3d">DEX listing</li></ul>
+    </div>
+    <div class="rc plan">
+      <div class="rph" data-t="r4p">Phase 4 — 2027</div>
+      <div class="rs p" data-t="rp">Planned</div>
+      <div class="rtit" data-t="r4t">Launch</div>
+      <ul class="rlist"><li data-t="r4a">Complete game (5 levels)</li><li data-t="r4b">Mobile version</li><li data-t="r4c">Education version</li><li data-t="r4d">Community governance</li></ul>
     </div>
   </div>
 </section>
 
-<!-- ROADMAP -->
-<section class="roadmap-section" id="roadmap">
-  <div class="reveal">
-    <p class="section-label" data-i18n="roadmap_label">Roadmap</p>
-    <h2 class="section-title" data-i18n="roadmap_title">The Journey<br><em style="font-style:italic;color:#4ecb82">ahead</em></h2>
-  </div>
-  <div class="roadmap-grid reveal">
-    <div class="road-card done">
-      <div class="road-phase" data-i18n="road1_phase">Phase 1 — Q2 2026</div>
-      <div class="road-status done-badge" data-i18n="road_done">✓ Complete</div>
-      <h3 class="road-title" data-i18n="road1_title">Foundation</h3>
-      <ul class="road-items">
-        <li data-i18n="road1_1">Playable prototype</li>
-        <li data-i18n="road1_2">SFLR token deployed</li>
-        <li data-i18n="road1_3">silentflora.io live</li>
-        <li data-i18n="road1_4">Project overview published</li>
-      </ul>
-    </div>
-    <div class="road-card current">
-      <div class="road-phase" data-i18n="road2_phase">Phase 2 — Q3 2026</div>
-      <div class="road-status current-badge" data-i18n="road_now">← Now</div>
-      <h3 class="road-title" data-i18n="road2_title">Community</h3>
-      <ul class="road-items">
-        <li data-i18n="road2_1">X and Discord launch</li>
-        <li data-i18n="road2_2">First public demo</li>
-        <li data-i18n="road2_3">Early community access</li>
-        <li data-i18n="road2_4">Legal structure</li>
-      </ul>
-    </div>
-    <div class="road-card">
-      <div class="road-phase" data-i18n="road3_phase">Phase 3 — Q4 2026</div>
-      <div class="road-status plan-badge" data-i18n="road_plan">Planned</div>
-      <h3 class="road-title" data-i18n="road3_title">Build</h3>
-      <ul class="road-items">
-        <li data-i18n="road3_1">Full game levels 1–3</li>
-        <li data-i18n="road3_2">In-game token mechanics</li>
-        <li data-i18n="road3_3">Grant applications</li>
-        <li data-i18n="road3_4">DEX listing</li>
-      </ul>
-    </div>
-    <div class="road-card">
-      <div class="road-phase" data-i18n="road4_phase">Phase 4 — 2027</div>
-      <div class="road-status plan-badge" data-i18n="road_plan">Planned</div>
-      <h3 class="road-title" data-i18n="road4_title">Launch</h3>
-      <ul class="road-items">
-        <li data-i18n="road4_1">Complete game (5 levels)</li>
-        <li data-i18n="road4_2">Mobile version</li>
-        <li data-i18n="road4_3">Education version</li>
-        <li data-i18n="road4_4">Community governance</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- TOKEN -->
-<section class="token-section" id="token">
-  <div class="token-grid">
-    <div class="token-info reveal">
-      <p class="section-label" data-i18n="token_label">The Token</p>
+<section class="tok" id="token">
+  <div class="tgrid">
+    <div class="tinfo rv">
+      <p class="slb" data-t="tl">The Token</p>
       <h2><em>SFLR</em></h2>
-      <p data-i18n="token_sub">SFLR is the in-game utility token of Silent Flora. It is earned through play and used within the game world. It is not a financial instrument and does not represent ownership in any entity.</p>
-      <div class="token-address">
-        <span>Contract Address — Polygon Mainnet</span>
-        0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E
-      </div>
-      <div class="hero-actions">
-        <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="btn-primary" data-i18n="token_btn">View on Polygonscan →</a>
-      </div>
+      <p data-t="ts">SFLR is the in-game utility token of Silent Flora. Earned through play. Used within the game. Not a financial instrument.</p>
+      <div class="tadr"><span>Contract Address — Polygon Mainnet</span>0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E</div>
+      <div class="ha"><a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="bp" data-t="tb">View on Polygonscan →</a></div>
     </div>
-    <div class="reveal">
-      <div class="tokenomics">
-        <div class="trow"><span class="trow-label">Total Supply</span><span class="trow-value green">100,000,000 SFLR</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok1">Player Rewards</span><span class="trow-value">40%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok2">Game Ecosystem</span><span class="trow-value">25%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok3">Early Community Access</span><span class="trow-value">20%</span></div>
-        <div class="trow"><span class="trow-label" data-i18n="tok4">Development / Reserve</span><span class="trow-value">15%</span></div>
-        <div class="trow"><span class="trow-label">Network</span><span class="trow-value green">Polygon</span></div>
-        <div class="trow"><span class="trow-label">Mining</span><span class="trow-value" data-i18n="tok5">None ✓</span></div>
+    <div class="rv">
+      <div class="toks">
+        <div class="trow"><span class="trl">Total Supply</span><span class="trv g">100,000,000 SFLR</span></div>
+        <div class="trow"><span class="trl" data-t="to1">Player Rewards</span><span class="trv">40%</span></div>
+        <div class="trow"><span class="trl" data-t="to2">Game Ecosystem</span><span class="trv">25%</span></div>
+        <div class="trow"><span class="trl" data-t="to3">Early Community Access</span><span class="trv">20%</span></div>
+        <div class="trow"><span class="trl" data-t="to4">Development / Reserve</span><span class="trv">15%</span></div>
+        <div class="trow"><span class="trl">Network</span><span class="trv g">Polygon</span></div>
+        <div class="trow"><span class="trl">Mining</span><span class="trv" data-t="to5">None ✓</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- LEGAL NOTICE BAR -->
-<div class="notice-bar">
-  <p data-i18n="notice_text">SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes.</p>
-</div>
+<div class="nb"><p data-t="nt2">SFLR is a utility token for the Silent Flora game. Not a financial instrument. No financial return is promised or implied.</p></div>
 
-<!-- GAME -->
-<section class="game-section" id="game">
-  <div class="game-inner">
-    <div class="reveal">
-      <p class="section-label" data-i18n="game_label">The Game</p>
-      <h2 class="section-title" data-i18n="game_title">What happens<br>when we act<br><em style="font-style:italic;color:#4ecb82">without thinking</em></h2>
-      <p class="section-sub" data-i18n="game_sub">Silent Flora shows what is at stake — not as a lecture, but as an experience. A quiet forest. A wandering figure. Every decision leaves a mark.</p>
-      <div class="hero-actions">
-        <a href="#" class="btn-secondary" data-i18n="game_btn">Game coming soon →</a>
-      </div>
+<section class="gmsec" id="game">
+  <div class="gi">
+    <div class="rv">
+      <p class="slb" data-t="gl">The Game</p>
+      <h2 class="stl" data-t="gt">What happens when we act <em>without thinking</em></h2>
+      <p class="ssu" data-t="gd">A quiet forest. A wandering figure. Every decision leaves a mark.</p>
+      <div class="ha"><a href="#" class="bs" data-t="gb">Game coming soon →</a></div>
     </div>
-    <div class="game-visual reveal">
-      <div class="game-frame">
-        <div class="game-corner tl"></div>
-        <div class="game-corner tr"></div>
-        <div class="game-corner bl"></div>
-        <div class="game-corner br"></div>
-        <div class="game-placeholder">🌿</div>
-        <div class="game-label">SilentFlora — Godot Engine — In Development</div>
+    <div class="rv">
+      <div class="gframe">
+        <div class="gcr tl"></div><div class="gcr tr"></div><div class="gcr bl"></div><div class="gcr br"></div>
+        <div class="gph">🌿</div>
+        <div class="glbl">SilentFlora — Godot Engine — In Development</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- MANIFESTO -->
-<section class="manifesto" id="manifesto">
-  <blockquote class="manifesto-quote reveal" data-i18n="manifesto_quote">"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."</blockquote>
-  <p class="manifesto-attr reveal">— Silent Flora, 2026</p>
+<section class="mfsec" id="manifesto">
+  <blockquote class="mqt rv" data-t="mq">"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."</blockquote>
+  <p class="mat rv">— Silent Flora, 2026</p>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <h2 class="reveal" data-i18n="cta_title">Ready to<br><em>explore?</em></h2>
-  <p class="reveal" data-i18n="cta_sub">Silent Flora is in development. Follow the journey and be part of the community from the beginning.</p>
-  <div class="cta-actions reveal">
-    <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="btn-primary" data-i18n="cta_btn1">View Token</a>
-    <a href="#game" class="btn-secondary" data-i18n="cta_btn2">The Game →</a>
+<section class="ctasec">
+  <h2 class="rv" data-t="ct">Ready to <em>explore?</em></h2>
+  <p class="rv" data-t="cs">Silent Flora is in development. Follow the journey from the beginning.</p>
+  <div class="ca rv">
+    <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank" class="bp" data-t="cb1">View Token</a>
+    <a href="#game" class="bs" data-t="cb2">The Game →</a>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
-  <div class="footer-text">SFLR — Polygon Mainnet — 2026</div>
-  <div class="footer-links">
+  <div class="flog">Silent<em style="font-style:italic;color:#4ecb82">Flora</em></div>
+  <div class="ftxt">SFLR — Polygon Mainnet — 2026</div>
+  <div class="flnks">
     <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank">Polygonscan</a>
     <a href="https://x.com/SilentFlora_io" target="_blank">X / Twitter</a>
   </div>
 </footer>
 
 <script>
-// THREE.JS EARTH with NASA texture
-(function() {
-    hero_eyebrow: 'Narrative Game — Blockchain — Polygon Network',
-    hero_title2: 'The Game',
-    hero_sub: 'A quiet forest. Every decision changes the world. Experience blockchain without knowing it — through play, reflection and consequence.',
-    hero_btn1: 'Discover the Game', hero_btn2: 'How it works →',
-    stat1: 'Total Supply', stat2: 'Mining Required', stat3: 'Earn Methods', stat4: 'Learning Levels',
-    pillars_label: 'How it works',
-    pillars_title: 'Three ways to\n<em style="font-style:italic;color:#4ecb82">participate</em>',
-    pillars_sub: 'SFLR is not bought — it is earned through genuine participation in the Silent Flora world.',
-    pillar1_text: 'Play the game, contribute to the world. SFLR is earned through genuine gameplay and creative contributions to the Silent Flora ecosystem.',
-    pillar2_text: 'Art, music, stories, ideas. The community shapes the world together — meaningful contributions are recognised with SFLR.',
-    pillar3_text: 'Testing, feedback, sharing. Those who help build the Silent Flora community contribute to something larger than the game itself.',
-    learn_label: 'The Learning Journey',
-    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">experienced</em>',
-    learn_sub: 'Five levels. Five concepts. No tutorials. You understand blockchain by living it — not by studying it.',
-    learn1_tag: 'Level 1 — Identity', learn1_title: 'Enter a name. Start playing.',
-    learn1_text: 'A wallet is created quietly in the background. The player discovers it when curiosity leads them there — not as a requirement, but as a feature of the world they already inhabit.',
-    learn2_tag: 'Level 2 — Value', learn2_title: 'Decisions earn rewards.',
-    learn2_text: 'SFLR is earned through gameplay. Value is created by action — not by purchase. The token represents what you have done, not what you have spent.',
-    learn3_tag: 'Level 3 — Exchange', learn3_title: 'Use tokens within the world.',
-    learn3_text: 'Tokens open new areas and can be shared with other players. Peer-to-peer exchange becomes natural before it becomes conceptual.',
-    learn4_tag: 'Level 4 — Community', learn4_title: 'Your voice shapes the world.',
-    learn4_text: 'Players give feedback on what happens next. Community participation is experienced as real contribution — not as a technical concept.',
-    token_label: 'The Token',
-    token_sub: 'SFLR is the in-game utility token of Silent Flora. It is earned through play and used within the game world. It is not a financial instrument and does not represent ownership in any entity.',
-    token_btn: 'View on Polygonscan →',
-    tok1: 'Player Rewards', tok2: 'Game Ecosystem', tok3: 'Early Community Access', tok4: 'Development / Reserve', tok5: 'None ✓',
-    notice_text: 'SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes.',
-    notice_link_de: 'Projektübersicht (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: 'The Game',
-    game_title: 'What happens\nwhen we act\n<em style="font-style:italic;color:#4ecb82">without thinking</em>',
-    game_sub: 'Silent Flora shows what is at stake — not as a lecture, but as an experience. A quiet forest. A wandering figure. Every decision leaves a mark.',
-    game_btn: 'Game coming soon →',
-    manifesto_quote: '"Blockchain is not for speculators. It is for everyone. Silent Flora is the bridge."',
-    cta_title: 'Ready to\n<em>explore?</em>',
-    cta_sub: 'Silent Flora is in development. Follow the journey and be part of the community from the beginning.',
-    cta_btn1: 'View Token', cta_btn2: 'The Game →',
-    footer_overview: 'Project Overview',
-    roadmap_label: 'Roadmap', roadmap_title: 'The Journey\n<em style="font-style:italic;color:#4ecb82">ahead</em>',
-    road_done: '✓ Complete', road_now: '← Now', road_plan: 'Planned',
-    road1_phase: 'Phase 1 — Q2 2026', road1_title: 'Foundation',
-    road1_1: 'Playable prototype', road1_2: 'SFLR token deployed', road1_3: 'silentflora.io live', road1_4: 'Project overview published',
-    road2_phase: 'Phase 2 — Q3 2026', road2_title: 'Community',
-    road2_1: 'X and Discord launch', road2_2: 'First public demo', road2_3: 'Early community access', road2_4: 'Legal structure',
-    road3_phase: 'Phase 3 — Q4 2026', road3_title: 'Build',
-    road3_1: 'Full game levels 1–3', road3_2: 'In-game token mechanics', road3_3: 'Grant applications', road3_4: 'DEX listing',
-    road4_phase: 'Phase 4 — 2027', road4_title: 'Launch',
-    road4_1: 'Complete game (5 levels)', road4_2: 'Mobile version', road4_3: 'Education version', road4_4: 'Community governance'
-  },
-  de: {
-    nav_game: 'Game', nav_learn: 'Lernen', nav_token: 'Token', nav_manifesto: 'Manifest', nav_cta: 'Entdecken',
-    hero_eyebrow: 'Narratives Spiel — Blockchain — Polygon Netzwerk',
-    hero_title2: 'Das Spiel',
-    hero_sub: 'Ein stiller Wald. Jede Entscheidung verändert die Welt. Blockchain erleben ohne es zu wissen — durch Spielen, Nachdenken und Konsequenz.',
-    hero_btn1: 'Das Spiel entdecken', hero_btn2: 'Wie es funktioniert →',
-    stat1: 'Gesamtangebot', stat2: 'Mining nötig', stat3: 'Verdienst-Wege', stat4: 'Lernlevel',
-    pillars_label: 'Wie es funktioniert',
-    pillars_title: 'Drei Wege zur\n<em style="font-style:italic;color:#4ecb82">Teilnahme</em>',
-    pillars_sub: 'SFLR wird nicht gekauft — er wird durch echte Teilnahme in der Silent Flora Welt verdient.',
-    pillar1_text: 'Spiel das Spiel, trage zur Welt bei. SFLR wird durch echtes Gameplay und kreative Beiträge verdient.',
-    pillar2_text: 'Kunst, Musik, Geschichten, Ideen. Die Community gestaltet die Welt gemeinsam — bedeutsame Beiträge werden mit SFLR anerkannt.',
-    pillar3_text: 'Testen, Feedback geben, teilen. Wer hilft Silent Flora aufzubauen, trägt zu etwas Grösserem als dem Spiel bei.',
-    learn_label: 'Die Lernreise',
-    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">erlebt</em>',
-    learn_sub: 'Fünf Level. Fünf Konzepte. Keine Tutorials. Blockchain verstehen durch Erleben — nicht durch Studieren.',
-    learn1_tag: 'Level 1 — Identität', learn1_title: 'Namen eingeben. Spielen beginnen.',
-    learn1_text: 'Das Spiel beginnt sofort — kein Wallet nötig um anzufangen. Spieler die ihr eigenes Wallet verbinden möchten können das jederzeit tun. Silent Flora hält oder verwaltet keine privaten Schlüssel. Dein Wallet bleibt vollständig unter deiner Kontrolle.',
-    learn2_tag: 'Level 2 — Wert', learn2_title: 'Entscheidungen bringen Belohnungen.',
-    learn2_text: 'SFLR wird durch Gameplay verdient. Wert entsteht durch Handeln — nicht durch Kaufen. Der Token repräsentiert was du getan hast, nicht was du ausgegeben hast.',
-    learn3_tag: 'Level 3 — Austausch', learn3_title: 'Token in der Welt nutzen.',
-    learn3_text: 'Token öffnen neue Bereiche und können mit anderen Spielern geteilt werden. Peer-to-Peer Austausch wird natürlich bevor er konzeptuell wird.',
-    learn4_tag: 'Level 4 — Community', learn4_title: 'Deine Stimme gestaltet die Welt.',
-    learn4_text: 'Spieler geben Feedback was als nächstes passiert. Community-Teilnahme wird als echter Beitrag erlebt — nicht als technisches Konzept.',
-    token_label: 'Der Token',
-    token_sub: 'SFLR ist der In-Game Utility Token von Silent Flora. Er wird durch Spielen verdient und innerhalb der Spielwelt verwendet. Er ist kein Finanzinstrument und repräsentiert keine Eigentumsrechte.',
-    token_btn: 'Auf Polygonscan ansehen →',
-    tok1: 'Spieler Belohnungen', tok2: 'Spiel Ökosystem', tok3: 'Früher Community-Zugang', tok4: 'Entwicklung / Reserve', tok5: 'Keins ✓',
-    notice_text: 'SFLR ist ein Utility Token für die Nutzung innerhalb des Silent Flora Spiels. Er ist kein Finanzinstrument, kein Wertpapier, und es wird keine finanzielle Rendite versprochen oder impliziert. Früher Community-Zugang ist für aktive Tester und Mitwirkende — nicht für Investitionszwecke.',
-    notice_link_de: 'Projektübersicht (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: 'Das Spiel',
-    game_title: 'Was passiert\nwenn wir\n<em style="font-style:italic;color:#4ecb82">ohne Nachdenken</em> handeln',
-    game_sub: 'Silent Flora zeigt was auf dem Spiel steht — nicht als Predigt, sondern als Erfahrung. Ein stiller Wald. Eine wandernde Figur. Jede Entscheidung hinterlässt eine Spur.',
-    game_btn: 'Game coming soon →',
-    manifesto_quote: '"Blockchain ist nicht für Spekulanten. Sie ist für alle. Silent Flora ist die Brücke."',
-    cta_title: 'Bereit zum\n<em>Entdecken?</em>',
-    cta_sub: 'Silent Flora ist in Entwicklung. Begleite die Reise und sei von Anfang an Teil der Community.',
-    cta_btn1: 'Token ansehen', cta_btn2: 'Das Spiel →',
-    footer_overview: 'Projektübersicht',
-    roadmap_label: 'Roadmap', roadmap_title: 'Die Reise\n<em style="font-style:italic;color:#4ecb82">voraus</em>',
-    road_done: '✓ Abgeschlossen', road_now: '← Jetzt', road_plan: 'Geplant',
-    road1_phase: 'Phase 1 — Q2 2026', road1_title: 'Fundament',
-    road1_1: 'Spielbarer Prototyp', road1_2: 'SFLR Token deployed', road1_3: 'silentflora.io live', road1_4: 'Projektübersicht veröffentlicht',
-    road2_phase: 'Phase 2 — Q3 2026', road2_title: 'Community',
-    road2_1: 'X und Discord Launch', road2_2: 'Erste öffentliche Demo', road2_3: 'Früher Community-Zugang', road2_4: 'Rechtliche Struktur',
-    road3_phase: 'Phase 3 — Q4 2026', road3_title: 'Aufbau',
-    road3_1: 'Vollständige Level 1–3', road3_2: 'In-Game Token Mechaniken', road3_3: 'Grant-Anträge', road3_4: 'DEX Listing',
-    road4_phase: 'Phase 4 — 2027', road4_title: 'Launch',
-    road4_1: 'Vollständiges Spiel (5 Level)', road4_2: 'Mobile Version', road4_3: 'Education Version', road4_4: 'Community Governance'
-  },
-  fr: {
-    nav_game: 'Jeu', nav_learn: 'Apprendre', nav_token: 'Token', nav_manifesto: 'Manifeste', nav_cta: 'Explorer',
-    hero_eyebrow: 'Jeu Narratif — Blockchain — Réseau Polygon',
-    hero_title2: 'Le Jeu',
-    hero_sub: 'Une forêt silencieuse. Chaque décision change le monde. Découvrez la blockchain sans le savoir — par le jeu, la réflexion et la conséquence.',
-    hero_btn1: 'Découvrir le Jeu', hero_btn2: 'Comment ça marche →',
-    stat1: 'Offre Totale', stat2: 'Minage Requis', stat3: 'Méthodes de Gain', stat4: 'Niveaux',
-    pillars_label: 'Comment ça marche',
-    pillars_title: 'Trois façons de\n<em style="font-style:italic;color:#4ecb82">participer</em>',
-    pillars_sub: 'SFLR ne s\'achète pas — il se gagne par une participation authentique dans le monde de Silent Flora.',
-    pillar1_text: 'Jouez, contribuez au monde. SFLR est gagné par le gameplay et les contributions créatives.',
-    pillar2_text: 'Art, musique, histoires, idées. La communauté façonne le monde ensemble.',
-    pillar3_text: 'Tests, retours, partage. Ceux qui aident à construire Silent Flora contribuent à quelque chose de plus grand.',
-    learn_label: 'Le Voyage d\'Apprentissage',
-    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">vécue</em>',
-    learn_sub: 'Cinq niveaux. Cinq concepts. Pas de tutoriels. Comprendre la blockchain en la vivant.',
-    learn1_tag: 'Niveau 1 — Identité', learn1_title: 'Entrez un nom. Commencez à jouer.',
-    learn1_text: 'Un portefeuille est créé en arrière-plan. Le joueur le découvre quand la curiosité l\'y mène.',
-    learn2_tag: 'Niveau 2 — Valeur', learn2_title: 'Les décisions apportent des récompenses.',
-    learn2_text: 'SFLR est gagné par le gameplay. La valeur est créée par l\'action — pas par l\'achat.',
-    learn3_tag: 'Niveau 3 — Échange', learn3_title: 'Utilisez des tokens dans le monde.',
-    learn3_text: 'Les tokens ouvrent de nouvelles zones et peuvent être partagés avec d\'autres joueurs.',
-    learn4_tag: 'Niveau 4 — Communauté', learn4_title: 'Votre voix façonne le monde.',
-    learn4_text: 'Les joueurs donnent leur avis sur la suite. La participation communautaire est vécue comme une vraie contribution.',
-    token_label: 'Le Token',
-    token_sub: 'SFLR est le token utilitaire de Silent Flora. Il est gagné par le jeu et utilisé dans le monde du jeu. Ce n\'est pas un instrument financier.',
-    token_btn: 'Voir sur Polygonscan →',
-    tok1: 'Récompenses Joueurs', tok2: 'Écosystème Jeu', tok3: 'Accès Communauté', tok4: 'Développement / Réserve', tok5: 'Aucun ✓',
-    notice_text: 'SFLR est un token utilitaire pour le jeu Silent Flora. Ce n\'est pas un instrument financier et aucun rendement n\'est promis.',
-    notice_link_de: 'Aperçu (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: 'Le Jeu',
-    game_title: 'Ce qui arrive\nquand on agit\n<em style="font-style:italic;color:#4ecb82">sans réfléchir</em>',
-    game_sub: 'Silent Flora montre ce qui est en jeu — pas comme une leçon, mais comme une expérience.',
-    game_btn: 'Jeu bientôt disponible →',
-    manifesto_quote: '"La blockchain n\'est pas pour les spéculateurs. Elle est pour tous. Silent Flora est le pont."',
-    cta_title: 'Prêt à\n<em>explorer?</em>',
-    cta_sub: 'Silent Flora est en développement. Suivez le voyage depuis le début.',
-    cta_btn1: 'Voir le Token', cta_btn2: 'Le Jeu →',
-    footer_overview: 'Aperçu du Projet',
-    roadmap_label: 'Feuille de route', roadmap_title: 'Le Voyage\n<em style="font-style:italic;color:#4ecb82">à venir</em>',
-    road_done: '✓ Terminé', road_now: '← Maintenant', road_plan: 'Prévu',
-    road1_phase:'Phase 1 — Q2 2026',road1_title:'Fondation',road1_1:'Prototype jouable',road1_2:'Token SFLR déployé',road1_3:'silentflora.io live',road1_4:'Aperçu publié',
-    road2_phase:'Phase 2 — Q3 2026',road2_title:'Communauté',road2_1:'Lancement X et Discord',road2_2:'Première démo',road2_3:'Accès communauté',road2_4:'Structure légale',
-    road3_phase:'Phase 3 — Q4 2026',road3_title:'Construction',road3_1:'Niveaux 1–3 complets',road3_2:'Mécaniques token',road3_3:'Demandes de subvention',road3_4:'Listing DEX',
-    road4_phase:'Phase 4 — 2027',road4_title:'Lancement',road4_1:'Jeu complet (5 niveaux)',road4_2:'Version mobile',road4_3:'Version éducation',road4_4:'Gouvernance communauté'
-  },
-  es: {
-    nav_game: 'Juego', nav_learn: 'Aprender', nav_token: 'Token', nav_manifesto: 'Manifiesto', nav_cta: 'Explorar',
-    hero_eyebrow: 'Juego Narrativo — Blockchain — Red Polygon',
-    hero_title2: 'El Juego',
-    hero_sub: 'Un bosque silencioso. Cada decisión cambia el mundo. Experimenta blockchain sin saberlo — a través del juego, la reflexión y la consecuencia.',
-    hero_btn1: 'Descubrir el Juego', hero_btn2: 'Cómo funciona →',
-    stat1: 'Suministro Total', stat2: 'Minería Requerida', stat3: 'Métodos de Participación', stat4: 'Niveles',
-    pillars_label: 'Cómo funciona',
-    pillars_title: 'Tres formas de\n<em style="font-style:italic;color:#4ecb82">participar</em>',
-    pillars_sub: 'SFLR no se compra — se gana mediante participación genuina en el mundo de Silent Flora.',
-    pillar1_text: 'Juega, contribuye al mundo. SFLR se gana a través del gameplay y contribuciones creativas.',
-    pillar2_text: 'Arte, música, historias, ideas. La comunidad da forma al mundo juntos.',
-    pillar3_text: 'Pruebas, feedback, compartir. Quienes ayudan a construir Silent Flora contribuyen a algo más grande.',
-    learn_label: 'El Viaje de Aprendizaje',
-    learn_title: 'Blockchain —\n<em style="font-style:italic;color:#4ecb82">vivida</em>',
-    learn_sub: 'Cinco niveles. Cinco conceptos. Sin tutoriales. Entiendes blockchain viviéndola.',
-    learn1_tag: 'Nivel 1 — Identidad', learn1_title: 'Ingresa un nombre. Empieza a jugar.',
-    learn1_text: 'Una wallet se crea en segundo plano. El jugador la descubre cuando la curiosidad lo lleva allí.',
-    learn2_tag: 'Nivel 2 — Valor', learn2_title: 'Las decisiones traen recompensas.',
-    learn2_text: 'SFLR se gana a través del gameplay. El valor se crea con acción — no con compra.',
-    learn3_tag: 'Nivel 3 — Intercambio', learn3_title: 'Usa tokens en el mundo.',
-    learn3_text: 'Los tokens abren nuevas áreas y pueden compartirse con otros jugadores.',
-    learn4_tag: 'Nivel 4 — Comunidad', learn4_title: 'Tu voz da forma al mundo.',
-    learn4_text: 'Los jugadores dan feedback sobre lo que sucede después. La participación comunitaria se vive como contribución real.',
-    token_label: 'El Token',
-    token_sub: 'SFLR es el token utilitario del juego Silent Flora. Se gana jugando y se usa dentro del mundo del juego. No es un instrumento financiero.',
-    token_btn: 'Ver en Polygonscan →',
-    tok1: 'Recompensas Jugadores', tok2: 'Ecosistema Juego', tok3: 'Acceso Comunidad', tok4: 'Desarrollo / Reserva', tok5: 'Ninguno ✓',
-    notice_text: 'SFLR es un token utilitario para uso dentro del juego Silent Flora. No es un instrumento financiero y no se promete ningún rendimiento.',
-    notice_link_de: 'Resumen (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: 'El Juego',
-    game_title: 'Qué pasa\ncuando actuamos\n<em style="font-style:italic;color:#4ecb82">sin pensar</em>',
-    game_sub: 'Silent Flora muestra lo que está en juego — no como lección, sino como experiencia.',
-    game_btn: 'Juego próximamente →',
-    manifesto_quote: '"Blockchain no es para especuladores. Es para todos. Silent Flora es el puente."',
-    cta_title: 'Listo para\n<em>explorar?</em>',
-    cta_sub: 'Silent Flora está en desarrollo. Sigue el viaje desde el principio.',
-    cta_btn1: 'Ver Token', cta_btn2: 'El Juego →',
-    footer_overview: 'Resumen del Proyecto',
-    roadmap_label: 'Hoja de ruta', roadmap_title: 'El Camino\n<em style="font-style:italic;color:#4ecb82">adelante</em>',
-    road_done: '✓ Completo', road_now: '← Ahora', road_plan: 'Planificado',
-    road1_phase:'Fase 1 — Q2 2026',road1_title:'Fundación',road1_1:'Prototipo jugable',road1_2:'Token SFLR desplegado',road1_3:'silentflora.io live',road1_4:'Resumen publicado',
-    road2_phase:'Fase 2 — Q3 2026',road2_title:'Comunidad',road2_1:'Lanzamiento X y Discord',road2_2:'Primera demo',road2_3:'Acceso comunidad',road2_4:'Estructura legal',
-    road3_phase:'Fase 3 — Q4 2026',road3_title:'Construcción',road3_1:'Niveles 1–3 completos',road3_2:'Mecánicas de token',road3_3:'Solicitudes de subvención',road3_4:'Listing DEX',
-    road4_phase:'Fase 4 — 2027',road4_title:'Lanzamiento',road4_1:'Juego completo (5 niveles)',road4_2:'Versión móvil',road4_3:'Versión educación',road4_4:'Gobernanza comunitaria'
-  },
-  zh: {
-    nav_game: '游戏', nav_learn: '学习', nav_token: '代币', nav_manifesto: '宣言', nav_cta: '探索',
-    hero_eyebrow: '叙事游戏 — 区块链 — Polygon 网络',
-    hero_title2: '游戏',
-    hero_sub: '一片寂静的森林。每个决定都会改变世界。在不知不觉中体验区块链 — 通过游戏、反思和后果。',
-    hero_btn1: '发现游戏', hero_btn2: '如何运作 →',
-    stat1: '总供应量', stat2: '需要挖矿', stat3: '参与方式', stat4: '学习关卡',
-    pillars_label: '如何运作',
-    pillars_title: '三种\n<em style="font-style:italic;color:#4ecb82">参与</em>方式',
-    pillars_sub: 'SFLR不是购买的 — 而是通过在Silent Flora世界中真实参与获得的。',
-    pillar1_text: '游戏、为世界做贡献。SFLR通过真实游戏和创意贡献获得。',
-    pillar2_text: '艺术、音乐、故事、想法。社区共同塑造世界。',
-    pillar3_text: '测试、反馈、分享。帮助建设Silent Flora的人贡献于更大的事业。',
-    learn_label: '学习之旅',
-    learn_title: '区块链 —\n<em style="font-style:italic;color:#4ecb82">亲身体验</em>',
-    learn_sub: '五个关卡。五个概念。无需教程。通过体验理解区块链。',
-    learn1_tag: '关卡1 — 身份', learn1_title: '输入名字。开始游戏。',
-    learn1_text: '钱包在后台自动创建。玩家在好奇心驱使下发现它。',
-    learn2_tag: '关卡2 — 价值', learn2_title: '决策带来奖励。',
-    learn2_text: 'SFLR通过游戏获得。价值通过行动创造 — 而非购买。',
-    learn3_tag: '关卡3 — 交换', learn3_title: '在世界中使用代币。',
-    learn3_text: '代币开启新区域，可与其他玩家分享。',
-    learn4_tag: '关卡4 — 社区', learn4_title: '你的声音塑造世界。',
-    learn4_text: '玩家对接下来发生的事情给出反馈。',
-    token_label: '代币',
-    token_sub: 'SFLR是Silent Flora游戏的实用代币。通过游戏获得，在游戏世界中使用。不是金融工具。',
-    token_btn: '在Polygonscan查看 →',
-    tok1: '玩家奖励', tok2: '游戏生态', tok3: '早期社区访问', tok4: '开发/储备', tok5: '无 ✓',
-    notice_text: 'SFLR是用于Silent Flora游戏的实用代币。不是金融工具，不承诺任何财务回报。',
-    notice_link_de: '项目概览 (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: '游戏',
-    game_title: '当我们\n<em style="font-style:italic;color:#4ecb82">不加思考</em>\n行动时会发生什么',
-    game_sub: 'Silent Flora展示了什么处于危险之中 — 不是说教，而是体验。',
-    game_btn: '游戏即将推出 →',
-    manifesto_quote: '"区块链不是为投机者准备的。它是为所有人准备的。Silent Flora是那座桥。"',
-    cta_title: '准备好\n<em>探索了吗？</em>',
-    cta_sub: 'Silent Flora正在开发中。从一开始就跟随这段旅程。',
-    cta_btn1: '查看代币', cta_btn2: '游戏 →',
-    footer_overview: '项目概览',
-    roadmap_label: '路线图', roadmap_title: '前方的\n<em style="font-style:italic;color:#4ecb82">旅程</em>',
-    road_done: '✓ 完成', road_now: '← 现在', road_plan: '计划中',
-    road1_phase:'第1阶段 — Q2 2026',road1_title:'基础',road1_1:'可玩原型',road1_2:'SFLR代币部署',road1_3:'silentflora.io上线',road1_4:'项目概览发布',
-    road2_phase:'第2阶段 — Q3 2026',road2_title:'社区',road2_1:'X和Discord启动',road2_2:'首个公开演示',road2_3:'早期社区访问',road2_4:'法律结构',
-    road3_phase:'第3阶段 — Q4 2026',road3_title:'建设',road3_1:'完整游戏关卡1-3',road3_2:'游戏内代币机制',road3_3:'资助申请',road3_4:'DEX上市',
-    road4_phase:'第4阶段 — 2027',road4_title:'发布',road4_1:'完整游戏（5关卡）',road4_2:'移动版本',road4_3:'教育版本',road4_4:'社区治理'
-  },
-  ko: {
-    nav_game: '게임', nav_learn: '배우기', nav_token: '토큰', nav_manifesto: '선언', nav_cta: '탐색',
-    hero_eyebrow: '내러티브 게임 — 블록체인 — Polygon 네트워크',
-    hero_title2: '게임',
-    hero_sub: '조용한 숲. 모든 결정이 세상을 바꿉니다. 알지 못한 채 블록체인을 경험하세요 — 놀이, 성찰, 결과를 통해.',
-    hero_btn1: '게임 발견', hero_btn2: '작동 방식 →',
-    stat1: '총 공급량', stat2: '채굴 필요', stat3: '참여 방법', stat4: '학습 레벨',
-    pillars_label: '작동 방식',
-    pillars_title: '세 가지\n<em style="font-style:italic;color:#4ecb82">참여</em> 방법',
-    pillars_sub: 'SFLR은 구매하는 것이 아닙니다 — Silent Flora 세계에서 진정한 참여를 통해 획득합니다.',
-    pillar1_text: '게임을 플레이하고 세계에 기여하세요. SFLR은 진정한 게임플레이와 창의적 기여를 통해 획득됩니다.',
-    pillar2_text: '예술, 음악, 이야기, 아이디어. 커뮤니티가 함께 세계를 만들어 갑니다.',
-    pillar3_text: '테스트, 피드백, 공유. Silent Flora 구축을 돕는 사람들은 게임보다 더 큰 것에 기여합니다.',
-    token_label: '토큰',
-    token_sub: 'SFLR은 Silent Flora의 인게임 유틸리티 토큰입니다. 게임을 통해 획득하고 게임 세계 내에서 사용됩니다. 금융 상품이 아닙니다.',
-    token_btn: 'Polygonscan에서 보기 →',
-    tok1: '플레이어 보상', tok2: '게임 생태계', tok3: '얼리 커뮤니티 접근', tok4: '개발 / 예비', tok5: '없음 ✓',
-    notice_text: 'SFLR은 Silent Flora 게임 내 사용을 위한 유틸리티 토큰입니다. 금융 상품이 아니며 어떠한 재무적 수익도 약속하거나 암시하지 않습니다.',
-    notice_link_de: '프로젝트 개요 (DE)', notice_link_en: 'Project Overview (EN)',
-    game_label: '게임',
-    game_title: '생각 없이\n행동하면\n<em style="font-style:italic;color:#4ecb82">어떻게 될까요</em>',
-    game_sub: 'Silent Flora는 무엇이 위태로운지 보여줍니다 — 강의가 아닌 경험으로.',
-    game_btn: '게임 곧 출시 →',
-    manifesto_quote: '"블록체인은 투기꾼을 위한 것이 아닙니다. 모두를 위한 것입니다. Silent Flora가 그 다리입니다."',
-    cta_title: '탐색할\n<em>준비가 되셨나요?</em>',
-    cta_sub: 'Silent Flora는 개발 중입니다. 처음부터 커뮤니티의 일원이 되세요.',
-    cta_btn1: '토큰 보기', cta_btn2: '게임 →',
-    footer_overview: '프로젝트 개요',
-    roadmap_label: '로드맵', roadmap_title: '앞으로의\n<em style="font-style:italic;color:#4ecb82">여정</em>',
-    road_done: '✓ 완료', road_now: '← 현재', road_plan: '계획됨',
-    road1_phase:'1단계 — Q2 2026',road1_title:'기반',road1_1:'플레이 가능한 프로토타입',road1_2:'SFLR 토큰 배포',road1_3:'silentflora.io 출시',road1_4:'프로젝트 개요 발행',
-    road2_phase:'2단계 — Q3 2026',road2_title:'커뮤니티',road2_1:'X 및 Discord 출시',road2_2:'첫 번째 공개 데모',road2_3:'얼리 커뮤니티 접근',road2_4:'법적 구조',
-    road3_phase:'3단계 — Q4 2026',road3_title:'개발',road3_1:'전체 게임 레벨 1-3',road3_2:'게임 내 토큰 메커니즘',road3_3:'보조금 신청',road3_4:'DEX 상장',
-    road4_phase:'4단계 — 2027',road4_title:'출시',road4_1:'완성된 게임 (5 레벨)',road4_2:'모바일 버전',road4_3:'교육 버전',road4_4:'커뮤니티 거버넌스'
 // THREE.JS EARTH
-(function() {
-  const script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-  script.onload = function() {
-    const canvas = document.getElementById('earth-canvas');
-    if (!canvas) return;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(160, 160);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 2.5;
-
-    // Load Earth texture from reliable CDN
-    const loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
-
-    // Procedural Earth texture - reliable fallback
-    const texCanvas = document.createElement('canvas');
-    texCanvas.width = 1024; texCanvas.height = 512;
-    const ctx = texCanvas.getContext('2d');
-
-    // Ocean gradient
-    const oceanGrad = ctx.createLinearGradient(0, 0, 0, 512);
-    oceanGrad.addColorStop(0, '#0a1f3a');
-    oceanGrad.addColorStop(0.5, '#0d2b4a');
-    oceanGrad.addColorStop(1, '#0a1f3a');
-    ctx.fillStyle = oceanGrad;
-    ctx.fillRect(0, 0, 1024, 512);
-
-    // Land masses - more detailed
-    ctx.fillStyle = '#2d6b35';
-
+(function(){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload=function(){
+    var canvas=document.getElementById('ec');
+    if(!canvas)return;
+    var R=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+    R.setSize(160,160);R.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(45,1,0.1,100);cam.position.z=2.5;
+    var tc=document.createElement('canvas');tc.width=1024;tc.height=512;
+    var cx=tc.getContext('2d');
+    var og=cx.createLinearGradient(0,0,0,512);
+    og.addColorStop(0,'#0a1f3a');og.addColorStop(.5,'#0d2b4a');og.addColorStop(1,'#0a1f3a');
+    cx.fillStyle=og;cx.fillRect(0,0,1024,512);
+    cx.fillStyle='#2d6b35';
     // North America
-    ctx.beginPath();
-    ctx.moveTo(120, 80); ctx.lineTo(200, 70); ctx.lineTo(230, 100);
-    ctx.lineTo(240, 150); ctx.lineTo(220, 200); ctx.lineTo(190, 240);
-    ctx.lineTo(150, 260); ctx.lineTo(110, 250); ctx.lineTo(80, 220);
-    ctx.lineTo(70, 170); ctx.lineTo(90, 120); ctx.closePath(); ctx.fill();
-
-    // Central America
-    ctx.beginPath(); ctx.ellipse(185, 285, 15, 30, 0.3, 0, Math.PI*2); ctx.fill();
-
+    cx.beginPath();cx.moveTo(120,80);cx.lineTo(200,70);cx.lineTo(235,105);cx.lineTo(242,155);cx.lineTo(218,205);cx.lineTo(188,245);cx.lineTo(148,262);cx.lineTo(108,250);cx.lineTo(78,218);cx.lineTo(68,170);cx.lineTo(88,122);cx.closePath();cx.fill();
+    cx.beginPath();cx.ellipse(185,285,14,28,.3,0,Math.PI*2);cx.fill();
     // South America
-    ctx.beginPath();
-    ctx.moveTo(200, 310); ctx.lineTo(240, 300); ctx.lineTo(260, 340);
-    ctx.lineTo(255, 400); ctx.lineTo(230, 440); ctx.lineTo(200, 450);
-    ctx.lineTo(180, 420); ctx.lineTo(175, 370); ctx.lineTo(185, 330);
-    ctx.closePath(); ctx.fill();
-
+    cx.beginPath();cx.moveTo(198,308);cx.lineTo(242,298);cx.lineTo(262,342);cx.lineTo(256,402);cx.lineTo(228,444);cx.lineTo(198,452);cx.lineTo(178,422);cx.lineTo(173,372);cx.lineTo(183,330);cx.closePath();cx.fill();
     // Europe
-    ctx.beginPath();
-    ctx.moveTo(440, 80); ctx.lineTo(490, 75); ctx.lineTo(510, 95);
-    ctx.lineTo(505, 130); ctx.lineTo(480, 145); ctx.lineTo(450, 140);
-    ctx.lineTo(430, 120); ctx.lineTo(435, 95); ctx.closePath(); ctx.fill();
-
-    // Scandinavia
-    ctx.beginPath(); ctx.ellipse(480, 60, 18, 28, -0.2, 0, Math.PI*2); ctx.fill();
-
+    cx.beginPath();cx.moveTo(438,78);cx.lineTo(492,73);cx.lineTo(512,95);cx.lineTo(507,132);cx.lineTo(480,147);cx.lineTo(448,142);cx.lineTo(428,120);cx.lineTo(433,93);cx.closePath();cx.fill();
+    cx.beginPath();cx.ellipse(478,58,17,27,-.2,0,Math.PI*2);cx.fill();
     // Africa
-    ctx.beginPath();
-    ctx.moveTo(455, 160); ctx.lineTo(510, 155); ctx.lineTo(535, 185);
-    ctx.lineTo(540, 250); ctx.lineTo(520, 320); ctx.lineTo(490, 370);
-    ctx.lineTo(460, 380); ctx.lineTo(440, 350); ctx.lineTo(435, 280);
-    ctx.lineTo(440, 210); ctx.lineTo(448, 175); ctx.closePath(); ctx.fill();
-
-    // Middle East
-    ctx.beginPath(); ctx.ellipse(555, 175, 30, 22, 0, 0, Math.PI*2); ctx.fill();
-
-    // Asia - main
-    ctx.beginPath();
-    ctx.moveTo(560, 70); ctx.lineTo(700, 60); ctx.lineTo(800, 75);
-    ctx.lineTo(850, 100); ctx.lineTo(860, 150); ctx.lineTo(820, 190);
-    ctx.lineTo(750, 200); ctx.lineTo(680, 195); ctx.lineTo(610, 180);
-    ctx.lineTo(570, 155); ctx.lineTo(555, 120); ctx.lineTo(558, 85);
-    ctx.closePath(); ctx.fill();
-
-    // India
-    ctx.beginPath(); ctx.ellipse(650, 230, 28, 42, 0, 0, Math.PI*2); ctx.fill();
-
-    // Southeast Asia
-    ctx.beginPath(); ctx.ellipse(780, 235, 35, 25, 0.2, 0, Math.PI*2); ctx.fill();
-
-    // China/Korea/Japan area
-    ctx.beginPath(); ctx.ellipse(830, 155, 40, 30, 0, 0, Math.PI*2); ctx.fill();
-
+    cx.beginPath();cx.moveTo(452,158);cx.lineTo(512,153);cx.lineTo(537,185);cx.lineTo(542,252);cx.lineTo(522,322);cx.lineTo(492,372);cx.lineTo(460,382);cx.lineTo(438,350);cx.lineTo(433,280);cx.lineTo(438,208);cx.lineTo(446,173);cx.closePath();cx.fill();
+    cx.beginPath();cx.ellipse(558,177,32,22,0,0,Math.PI*2);cx.fill();
+    // Asia
+    cx.beginPath();cx.moveTo(562,68);cx.lineTo(702,58);cx.lineTo(802,73);cx.lineTo(852,100);cx.lineTo(862,152);cx.lineTo(822,192);cx.lineTo(752,202);cx.lineTo(682,197);cx.lineTo(612,182);cx.lineTo(572,157);cx.lineTo(557,122);cx.lineTo(560,83);cx.closePath();cx.fill();
+    cx.beginPath();cx.ellipse(652,232,27,42,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(782,237,36,26,.2,0,Math.PI*2);cx.fill();
     // Australia
-    ctx.beginPath();
-    ctx.moveTo(810, 320); ctx.lineTo(870, 310); ctx.lineTo(900, 335);
-    ctx.lineTo(905, 375); ctx.lineTo(875, 400); ctx.lineTo(830, 405);
-    ctx.lineTo(800, 385); ctx.lineTo(795, 350); ctx.closePath(); ctx.fill();
-
-    // Greenland
-    ctx.fillStyle = '#3a7a42';
-    ctx.beginPath(); ctx.ellipse(290, 55, 35, 28, 0, 0, Math.PI*2); ctx.fill();
-
-    // Ice caps
-    ctx.fillStyle = 'rgba(200, 230, 255, 0.7)';
-    ctx.beginPath(); ctx.ellipse(512, 10, 200, 18, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(512, 502, 180, 15, 0, 0, Math.PI*2); ctx.fill();
-
-    // Antarctica
-    ctx.fillStyle = 'rgba(230, 240, 255, 0.5)';
-    ctx.beginPath(); ctx.ellipse(512, 490, 220, 25, 0, 0, Math.PI*2); ctx.fill();
-
-    // Cloud layer
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.beginPath(); ctx.ellipse(300, 120, 80, 20, -0.3, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(650, 80, 60, 15, 0.2, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(150, 300, 50, 15, 0.1, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(850, 250, 55, 12, -0.1, 0, Math.PI*2); ctx.fill();
-
-    // Specular highlight (ocean shimmer)
-    const shimmer = ctx.createRadialGradient(350, 200, 0, 350, 200, 200);
-    shimmer.addColorStop(0, 'rgba(100,180,255,0.06)');
-    shimmer.addColorStop(1, 'transparent');
-    ctx.fillStyle = shimmer;
-    ctx.fillRect(0, 0, 1024, 512);
-
-    const earthTexture = new THREE.CanvasTexture(texCanvas);
-
-    const mat = new THREE.MeshPhongMaterial({
-      map: earthTexture,
-      specular: new THREE.Color(0x1a3a5a),
-      shininess: 25,
-    });
-
-    const earth = new THREE.Mesh(geo, mat);
-    scene.add(earth);
-
-    // Atmosphere
-    const atmMat = new THREE.MeshPhongMaterial({
-      color: 0x4ecb82, transparent: true, opacity: 0.07, side: THREE.FrontSide,
-    });
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.06, 32, 32), atmMat));
-
-    // Lights
-    const sun = new THREE.DirectionalLight(0xffffff, 1.3);
-    sun.position.set(3, 1, 2);
-    scene.add(sun);
-    scene.add(new THREE.AmbientLight(0x1a3a2a, 0.6));
-
-    function animate() {
-      requestAnimationFrame(animate);
-      earth.rotation.y += 0.003;
-      renderer.render(scene, camera);
-    }
-    animate();
+    cx.beginPath();cx.moveTo(812,318);cx.lineTo(872,308);cx.lineTo(902,335);cx.lineTo(907,377);cx.lineTo(877,402);cx.lineTo(832,407);cx.lineTo(802,387);cx.lineTo(797,352);cx.closePath();cx.fill();
+    cx.fillStyle='#3a7a42';cx.beginPath();cx.ellipse(292,53,37,28,0,0,Math.PI*2);cx.fill();
+    cx.fillStyle='rgba(200,228,255,.75)';
+    cx.beginPath();cx.ellipse(512,8,200,17,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(512,504,185,14,0,0,Math.PI*2);cx.fill();
+    cx.fillStyle='rgba(255,255,255,.09)';
+    cx.beginPath();cx.ellipse(298,118,82,19,-.3,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(648,78,62,14,.2,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(148,302,52,14,.1,0,Math.PI*2);cx.fill();
+    var tex=new THREE.CanvasTexture(tc);
+    var geo=new THREE.SphereGeometry(1,64,64);
+    var mat=new THREE.MeshPhongMaterial({map:tex,specular:new THREE.Color(0x1a3a5a),shininess:25});
+    var earth=new THREE.Mesh(geo,mat);scene.add(earth);
+    var atm=new THREE.MeshPhongMaterial({color:0x4ecb82,transparent:true,opacity:.07,side:THREE.FrontSide});
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.06,32,32),atm));
+    var sun=new THREE.DirectionalLight(0xffffff,1.3);sun.position.set(3,1,2);scene.add(sun);
+    scene.add(new THREE.AmbientLight(0x1a3a2a,.6));
+    (function a(){requestAnimationFrame(a);earth.rotation.y+=.003;R.render(scene,cam)})();
   };
-  document.head.appendChild(script);
+  document.head.appendChild(s);
 })();
 
 // Cursor
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx=0, my=0, rx=0, ry=0;
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx-4+'px';
-  cursor.style.top = my-4+'px';
-});
-
-function animRing() {
-  rx += (mx-rx-16)*0.12;
-  ry += (my-ry-16)*0.12;
-  ring.style.left = rx+'px';
-  ring.style.top = ry+'px';
-  requestAnimationFrame(animRing);
-}
-animRing();
-
-document.querySelectorAll('a, button').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.transform='scale(3)'; ring.style.opacity='0'; });
-  el.addEventListener('mouseleave', () => { cursor.style.transform='scale(1)'; ring.style.opacity='1'; });
+var cur=document.getElementById('cur'),curr=document.getElementById('curr');
+var mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;cur.style.left=mx-4+'px';cur.style.top=my-4+'px'});
+(function ar(){rx+=(mx-rx-16)*.12;ry+=(my-ry-16)*.12;curr.style.left=rx+'px';curr.style.top=ry+'px';requestAnimationFrame(ar)})();
+document.querySelectorAll('a,button').forEach(function(el){
+  el.addEventListener('mouseenter',function(){cur.style.transform='scale(3)';curr.style.opacity='0'});
+  el.addEventListener('mouseleave',function(){cur.style.transform='scale(1)';curr.style.opacity='1'});
 });
 
 // Scroll reveal
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.rv').forEach(function(el){obs.observe(el)});
 </script>
 </body>
 </html>
