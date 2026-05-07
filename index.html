@@ -159,6 +159,24 @@
   .pillar-title em { font-style:italic; color:var(--green-light); }
   .pillar-text { font-size:16px; font-weight:300; color:var(--text-muted); line-height:1.8; }
 
+  /* ROADMAP */
+  .roadmap-section { background:var(--deep); padding:120px 48px; }
+  .roadmap-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); margin-top:64px; }
+  .road-card { background:var(--card); padding:40px 32px; position:relative; overflow:hidden; transition:background 0.3s; }
+  .road-card:hover { background:var(--surface); }
+  .road-card.done { border-top:2px solid var(--green-light); }
+  .road-card.current { border-top:2px solid var(--gold); }
+  .road-card:not(.done):not(.current) { border-top:2px solid var(--text-dim); }
+  .road-phase { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; }
+  .road-status { display:inline-block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; padding:3px 8px; margin-bottom:20px; }
+  .done-badge { color:var(--green-light); background:rgba(78,203,130,0.1); border:1px solid rgba(78,203,130,0.3); }
+  .current-badge { color:var(--amber); background:rgba(200,146,42,0.1); border:1px solid rgba(200,146,42,0.3); }
+  .plan-badge { color:var(--text-muted); background:rgba(255,255,255,0.03); border:1px solid var(--border); }
+  .road-title { font-size:22px; font-weight:300; color:var(--text); margin-bottom:16px; }
+  .road-items { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .road-items li { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.05em; color:var(--text-muted); padding-left:16px; position:relative; }
+  .road-items li::before { content:'—'; position:absolute; left:0; color:var(--green-dark); }
+
   /* LEARNING */
   .learning { background:var(--black); }
   .learning-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:64px; }
@@ -351,33 +369,56 @@
   </div>
 </section>
 
-<!-- LEARNING JOURNEY -->
-<section class="learning" id="learn">
+<!-- ROADMAP -->
+<section class="roadmap-section" id="roadmap">
   <div class="reveal">
-    <p class="section-label" data-i18n="learn_label">The Learning Journey</p>
-    <h2 class="section-title" data-i18n="learn_title">Blockchain —<br><em style="font-style:italic;color:#4ecb82">experienced</em></h2>
-    <p class="section-sub" data-i18n="learn_sub">Five levels. Five concepts. No tutorials. You understand blockchain by living it — not by studying it.</p>
+    <p class="section-label" data-i18n="roadmap_label">Roadmap</p>
+    <h2 class="section-title" data-i18n="roadmap_title">The Journey<br><em style="font-style:italic;color:#4ecb82">ahead</em></h2>
   </div>
-  <div class="learning-grid reveal">
-    <div class="learn-card">
-      <div class="learn-tag" data-i18n="learn1_tag">Level 1 — Identity</div>
-      <h3 class="learn-title" data-i18n="learn1_title">Enter a name. Start playing.</h3>
-      <p class="learn-text" data-i18n="learn1_text">Play begins immediately — no wallet needed to start. Players who want to connect their own wallet can do so at any time. Silent Flora never holds or manages private keys. Your wallet remains fully under your control.</p>
+  <div class="roadmap-grid reveal">
+    <div class="road-card done">
+      <div class="road-phase" data-i18n="road1_phase">Phase 1 — Q2 2026</div>
+      <div class="road-status done-badge" data-i18n="road_done">✓ Complete</div>
+      <h3 class="road-title" data-i18n="road1_title">Foundation</h3>
+      <ul class="road-items">
+        <li data-i18n="road1_1">Playable prototype</li>
+        <li data-i18n="road1_2">SFLR token deployed</li>
+        <li data-i18n="road1_3">silentflora.io live</li>
+        <li data-i18n="road1_4">Project overview published</li>
+      </ul>
     </div>
-    <div class="learn-card">
-      <div class="learn-tag" data-i18n="learn2_tag">Level 2 — Value</div>
-      <h3 class="learn-title" data-i18n="learn2_title">Decisions earn rewards.</h3>
-      <p class="learn-text" data-i18n="learn2_text">SFLR is earned through gameplay. Value is created by action — not by purchase. The token represents what you have done, not what you have spent.</p>
+    <div class="road-card current">
+      <div class="road-phase" data-i18n="road2_phase">Phase 2 — Q3 2026</div>
+      <div class="road-status current-badge" data-i18n="road_now">← Now</div>
+      <h3 class="road-title" data-i18n="road2_title">Community</h3>
+      <ul class="road-items">
+        <li data-i18n="road2_1">X and Discord launch</li>
+        <li data-i18n="road2_2">First public demo</li>
+        <li data-i18n="road2_3">Early community access</li>
+        <li data-i18n="road2_4">Legal structure</li>
+      </ul>
     </div>
-    <div class="learn-card">
-      <div class="learn-tag" data-i18n="learn3_tag">Level 3 — Exchange</div>
-      <h3 class="learn-title" data-i18n="learn3_title">Use tokens within the world.</h3>
-      <p class="learn-text" data-i18n="learn3_text">Tokens open new areas and can be shared with other players. Peer-to-peer exchange becomes natural before it becomes conceptual.</p>
+    <div class="road-card">
+      <div class="road-phase" data-i18n="road3_phase">Phase 3 — Q4 2026</div>
+      <div class="road-status plan-badge" data-i18n="road_plan">Planned</div>
+      <h3 class="road-title" data-i18n="road3_title">Build</h3>
+      <ul class="road-items">
+        <li data-i18n="road3_1">Full game levels 1–3</li>
+        <li data-i18n="road3_2">In-game token mechanics</li>
+        <li data-i18n="road3_3">Grant applications</li>
+        <li data-i18n="road3_4">DEX listing</li>
+      </ul>
     </div>
-    <div class="learn-card">
-      <div class="learn-tag" data-i18n="learn4_tag">Level 4 — Community</div>
-      <h3 class="learn-title" data-i18n="learn4_title">Your voice shapes the world.</h3>
-      <p class="learn-text" data-i18n="learn4_text">Players give feedback on what happens next. Community participation is experienced as real contribution — not as a technical concept.</p>
+    <div class="road-card">
+      <div class="road-phase" data-i18n="road4_phase">Phase 4 — 2027</div>
+      <div class="road-status plan-badge" data-i18n="road_plan">Planned</div>
+      <h3 class="road-title" data-i18n="road4_title">Launch</h3>
+      <ul class="road-items">
+        <li data-i18n="road4_1">Complete game (5 levels)</li>
+        <li data-i18n="road4_2">Mobile version</li>
+        <li data-i18n="road4_3">Education version</li>
+        <li data-i18n="road4_4">Community governance</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -507,7 +548,17 @@ const i18n = {
     cta_title: 'Ready to\n<em>explore?</em>',
     cta_sub: 'Silent Flora is in development. Follow the journey and be part of the community from the beginning.',
     cta_btn1: 'View Token', cta_btn2: 'The Game →',
-    footer_overview: 'Project Overview'
+    footer_overview: 'Project Overview',
+    roadmap_label: 'Roadmap', roadmap_title: 'The Journey\n<em style="font-style:italic;color:#4ecb82">ahead</em>',
+    road_done: '✓ Complete', road_now: '← Now', road_plan: 'Planned',
+    road1_phase: 'Phase 1 — Q2 2026', road1_title: 'Foundation',
+    road1_1: 'Playable prototype', road1_2: 'SFLR token deployed', road1_3: 'silentflora.io live', road1_4: 'Project overview published',
+    road2_phase: 'Phase 2 — Q3 2026', road2_title: 'Community',
+    road2_1: 'X and Discord launch', road2_2: 'First public demo', road2_3: 'Early community access', road2_4: 'Legal structure',
+    road3_phase: 'Phase 3 — Q4 2026', road3_title: 'Build',
+    road3_1: 'Full game levels 1–3', road3_2: 'In-game token mechanics', road3_3: 'Grant applications', road3_4: 'DEX listing',
+    road4_phase: 'Phase 4 — 2027', road4_title: 'Launch',
+    road4_1: 'Complete game (5 levels)', road4_2: 'Mobile version', road4_3: 'Education version', road4_4: 'Community governance'
   },
   de: {
     nav_game: 'Game', nav_learn: 'Lernen', nav_token: 'Token', nav_manifesto: 'Manifest', nav_cta: 'Entdecken',
@@ -547,7 +598,17 @@ const i18n = {
     cta_title: 'Bereit zum\n<em>Entdecken?</em>',
     cta_sub: 'Silent Flora ist in Entwicklung. Begleite die Reise und sei von Anfang an Teil der Community.',
     cta_btn1: 'Token ansehen', cta_btn2: 'Das Spiel →',
-    footer_overview: 'Projektübersicht'
+    footer_overview: 'Projektübersicht',
+    roadmap_label: 'Roadmap', roadmap_title: 'Die Reise\n<em style="font-style:italic;color:#4ecb82">voraus</em>',
+    road_done: '✓ Abgeschlossen', road_now: '← Jetzt', road_plan: 'Geplant',
+    road1_phase: 'Phase 1 — Q2 2026', road1_title: 'Fundament',
+    road1_1: 'Spielbarer Prototyp', road1_2: 'SFLR Token deployed', road1_3: 'silentflora.io live', road1_4: 'Projektübersicht veröffentlicht',
+    road2_phase: 'Phase 2 — Q3 2026', road2_title: 'Community',
+    road2_1: 'X und Discord Launch', road2_2: 'Erste öffentliche Demo', road2_3: 'Früher Community-Zugang', road2_4: 'Rechtliche Struktur',
+    road3_phase: 'Phase 3 — Q4 2026', road3_title: 'Aufbau',
+    road3_1: 'Vollständige Level 1–3', road3_2: 'In-Game Token Mechaniken', road3_3: 'Grant-Anträge', road3_4: 'DEX Listing',
+    road4_phase: 'Phase 4 — 2027', road4_title: 'Launch',
+    road4_1: 'Vollständiges Spiel (5 Level)', road4_2: 'Mobile Version', road4_3: 'Education Version', road4_4: 'Community Governance'
   },
   fr: {
     nav_game: 'Jeu', nav_learn: 'Apprendre', nav_token: 'Token', nav_manifesto: 'Manifeste', nav_cta: 'Explorer',
@@ -587,7 +648,13 @@ const i18n = {
     cta_title: 'Prêt à\n<em>explorer?</em>',
     cta_sub: 'Silent Flora est en développement. Suivez le voyage depuis le début.',
     cta_btn1: 'Voir le Token', cta_btn2: 'Le Jeu →',
-    footer_overview: 'Aperçu du Projet'
+    footer_overview: 'Aperçu du Projet',
+    roadmap_label: 'Feuille de route', roadmap_title: 'Le Voyage\n<em style="font-style:italic;color:#4ecb82">à venir</em>',
+    road_done: '✓ Terminé', road_now: '← Maintenant', road_plan: 'Prévu',
+    road1_phase:'Phase 1 — Q2 2026',road1_title:'Fondation',road1_1:'Prototype jouable',road1_2:'Token SFLR déployé',road1_3:'silentflora.io live',road1_4:'Aperçu publié',
+    road2_phase:'Phase 2 — Q3 2026',road2_title:'Communauté',road2_1:'Lancement X et Discord',road2_2:'Première démo',road2_3:'Accès communauté',road2_4:'Structure légale',
+    road3_phase:'Phase 3 — Q4 2026',road3_title:'Construction',road3_1:'Niveaux 1–3 complets',road3_2:'Mécaniques token',road3_3:'Demandes de subvention',road3_4:'Listing DEX',
+    road4_phase:'Phase 4 — 2027',road4_title:'Lancement',road4_1:'Jeu complet (5 niveaux)',road4_2:'Version mobile',road4_3:'Version éducation',road4_4:'Gouvernance communauté'
   },
   es: {
     nav_game: 'Juego', nav_learn: 'Aprender', nav_token: 'Token', nav_manifesto: 'Manifiesto', nav_cta: 'Explorar',
@@ -627,7 +694,13 @@ const i18n = {
     cta_title: 'Listo para\n<em>explorar?</em>',
     cta_sub: 'Silent Flora está en desarrollo. Sigue el viaje desde el principio.',
     cta_btn1: 'Ver Token', cta_btn2: 'El Juego →',
-    footer_overview: 'Resumen del Proyecto'
+    footer_overview: 'Resumen del Proyecto',
+    roadmap_label: 'Hoja de ruta', roadmap_title: 'El Camino\n<em style="font-style:italic;color:#4ecb82">adelante</em>',
+    road_done: '✓ Completo', road_now: '← Ahora', road_plan: 'Planificado',
+    road1_phase:'Fase 1 — Q2 2026',road1_title:'Fundación',road1_1:'Prototipo jugable',road1_2:'Token SFLR desplegado',road1_3:'silentflora.io live',road1_4:'Resumen publicado',
+    road2_phase:'Fase 2 — Q3 2026',road2_title:'Comunidad',road2_1:'Lanzamiento X y Discord',road2_2:'Primera demo',road2_3:'Acceso comunidad',road2_4:'Estructura legal',
+    road3_phase:'Fase 3 — Q4 2026',road3_title:'Construcción',road3_1:'Niveles 1–3 completos',road3_2:'Mecánicas de token',road3_3:'Solicitudes de subvención',road3_4:'Listing DEX',
+    road4_phase:'Fase 4 — 2027',road4_title:'Lanzamiento',road4_1:'Juego completo (5 niveles)',road4_2:'Versión móvil',road4_3:'Versión educación',road4_4:'Gobernanza comunitaria'
   },
   zh: {
     nav_game: '游戏', nav_learn: '学习', nav_token: '代币', nav_manifesto: '宣言', nav_cta: '探索',
@@ -667,7 +740,13 @@ const i18n = {
     cta_title: '准备好\n<em>探索了吗？</em>',
     cta_sub: 'Silent Flora正在开发中。从一开始就跟随这段旅程。',
     cta_btn1: '查看代币', cta_btn2: '游戏 →',
-    footer_overview: '项目概览'
+    footer_overview: '项目概览',
+    roadmap_label: '路线图', roadmap_title: '前方的\n<em style="font-style:italic;color:#4ecb82">旅程</em>',
+    road_done: '✓ 完成', road_now: '← 现在', road_plan: '计划中',
+    road1_phase:'第1阶段 — Q2 2026',road1_title:'基础',road1_1:'可玩原型',road1_2:'SFLR代币部署',road1_3:'silentflora.io上线',road1_4:'项目概览发布',
+    road2_phase:'第2阶段 — Q3 2026',road2_title:'社区',road2_1:'X和Discord启动',road2_2:'首个公开演示',road2_3:'早期社区访问',road2_4:'法律结构',
+    road3_phase:'第3阶段 — Q4 2026',road3_title:'建设',road3_1:'完整游戏关卡1-3',road3_2:'游戏内代币机制',road3_3:'资助申请',road3_4:'DEX上市',
+    road4_phase:'第4阶段 — 2027',road4_title:'发布',road4_1:'完整游戏（5关卡）',road4_2:'移动版本',road4_3:'教育版本',road4_4:'社区治理'
   },
   ko: {
     nav_game: '게임', nav_learn: '배우기', nav_token: '토큰', nav_manifesto: '선언', nav_cta: '탐색',
@@ -682,17 +761,6 @@ const i18n = {
     pillar1_text: '게임을 플레이하고 세계에 기여하세요. SFLR은 진정한 게임플레이와 창의적 기여를 통해 획득됩니다.',
     pillar2_text: '예술, 음악, 이야기, 아이디어. 커뮤니티가 함께 세계를 만들어 갑니다.',
     pillar3_text: '테스트, 피드백, 공유. Silent Flora 구축을 돕는 사람들은 게임보다 더 큰 것에 기여합니다.',
-    learn_label: '학습 여정',
-    learn_title: '블록체인 —\n<em style="font-style:italic;color:#4ecb82">경험</em>',
-    learn_sub: '다섯 레벨. 다섯 개념. 튜토리얼 없음. 공부가 아닌 체험으로 블록체인을 이해하세요.',
-    learn1_tag: '레벨 1 — 정체성', learn1_title: '이름을 입력하세요. 게임을 시작하세요.',
-    learn1_text: '게임은 즉시 시작됩니다 — 시작에 지갑이 필요하지 않습니다. 자신의 지갑을 연결하고 싶은 플레이어는 언제든지 할 수 있습니다. Silent Flora는 개인 키를 보유하거나 관리하지 않습니다.',
-    learn2_tag: '레벨 2 — 가치', learn2_title: '결정이 보상을 가져옵니다.',
-    learn2_text: 'SFLR은 게임플레이를 통해 획득됩니다. 가치는 구매가 아닌 행동으로 만들어집니다.',
-    learn3_tag: '레벨 3 — 교환', learn3_title: '세계에서 토큰을 사용하세요.',
-    learn3_text: '토큰이 새로운 영역을 열고 다른 플레이어와 공유할 수 있습니다.',
-    learn4_tag: '레벨 4 — 커뮤니티', learn4_title: '당신의 목소리가 세계를 만듭니다.',
-    learn4_text: '플레이어들이 다음에 일어날 일에 대한 피드백을 제공합니다.',
     token_label: '토큰',
     token_sub: 'SFLR은 Silent Flora의 인게임 유틸리티 토큰입니다. 게임을 통해 획득하고 게임 세계 내에서 사용됩니다. 금융 상품이 아닙니다.',
     token_btn: 'Polygonscan에서 보기 →',
@@ -707,8 +775,13 @@ const i18n = {
     cta_title: '탐색할\n<em>준비가 되셨나요?</em>',
     cta_sub: 'Silent Flora는 개발 중입니다. 처음부터 커뮤니티의 일원이 되세요.',
     cta_btn1: '토큰 보기', cta_btn2: '게임 →',
-    footer_overview: '프로젝트 개요'
-  }
+    footer_overview: '프로젝트 개요',
+    roadmap_label: '로드맵', roadmap_title: '앞으로의\n<em style="font-style:italic;color:#4ecb82">여정</em>',
+    road_done: '✓ 완료', road_now: '← 현재', road_plan: '계획됨',
+    road1_phase:'1단계 — Q2 2026',road1_title:'기반',road1_1:'플레이 가능한 프로토타입',road1_2:'SFLR 토큰 배포',road1_3:'silentflora.io 출시',road1_4:'프로젝트 개요 발행',
+    road2_phase:'2단계 — Q3 2026',road2_title:'커뮤니티',road2_1:'X 및 Discord 출시',road2_2:'첫 번째 공개 데모',road2_3:'얼리 커뮤니티 접근',road2_4:'법적 구조',
+    road3_phase:'3단계 — Q4 2026',road3_title:'개발',road3_1:'전체 게임 레벨 1-3',road3_2:'게임 내 토큰 메커니즘',road3_3:'보조금 신청',road3_4:'DEX 상장',
+    road4_phase:'4단계 — 2027',road4_title:'출시',road4_1:'완성된 게임 (5 레벨)',road4_2:'모바일 버전',road4_3:'교육 버전',road4_4:'커뮤니티 거버넌스'
 };
 
 let currentLang = 'en';
@@ -731,7 +804,7 @@ function setLang(lang) {
   document.documentElement.lang = lang;
 }
 
-// THREE.JS EARTH
+// THREE.JS EARTH with NASA texture
 (function() {
   const script = document.createElement('script');
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
@@ -741,68 +814,61 @@ function setLang(lang) {
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setSize(160, 160);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.z = 2.5;
 
-    // Earth sphere
     const geo = new THREE.SphereGeometry(1, 64, 64);
 
-    // Create canvas texture for Earth
-    const texCanvas = document.createElement('canvas');
-    texCanvas.width = 512; texCanvas.height = 256;
-    const ctx = texCanvas.getContext('2d');
+    // Load NASA Earth texture
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
 
-    // Ocean
-    ctx.fillStyle = '#0d2b4a';
-    ctx.fillRect(0, 0, 512, 256);
+    // Use a reliable public domain Earth texture
+    const earthTex = loader.load(
+      'https://raw.githubusercontent.com/mrdoob/three.js/r128/examples/textures/planets/earth_atmos_2048.jpg',
+      undefined, undefined,
+      function() {
+        // Fallback: procedural texture
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 256;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#0d2b4a'; ctx.fillRect(0,0,512,256);
+        ctx.fillStyle = '#2d7a3a';
+        ctx.beginPath(); ctx.ellipse(230,110,28,58,-0.2,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(100,120,24,62,0.1,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(370,100,62,42,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(420,170,26,19,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(200,230,255,0.4)';
+        ctx.beginPath(); ctx.ellipse(256,8,120,12,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(256,248,110,10,0,0,Math.PI*2); ctx.fill();
+        mat.map = new THREE.CanvasTexture(c);
+        mat.needsUpdate = true;
+      }
+    );
 
-    // Land masses
-    ctx.fillStyle = '#2d7a3a';
-    // Europe/Africa
-    ctx.beginPath(); ctx.ellipse(230, 110, 25, 55, -0.2, 0, Math.PI*2); ctx.fill();
-    // Americas
-    ctx.beginPath(); ctx.ellipse(100, 120, 22, 60, 0.1, 0, Math.PI*2); ctx.fill();
-    // Asia
-    ctx.beginPath(); ctx.ellipse(370, 100, 60, 40, 0, 0, Math.PI*2); ctx.fill();
-    // Australia
-    ctx.beginPath(); ctx.ellipse(420, 170, 25, 18, 0, 0, Math.PI*2); ctx.fill();
-    // Ice caps
-    ctx.fillStyle = 'rgba(220,240,255,0.5)';
-    ctx.beginPath(); ctx.ellipse(256, 8, 120, 12, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(256, 248, 110, 10, 0, 0, Math.PI*2); ctx.fill();
-    // Clouds
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    ctx.beginPath(); ctx.ellipse(160, 60, 50, 12, -0.3, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(330, 140, 40, 10, 0.2, 0, Math.PI*2); ctx.fill();
-
-    const texture = new THREE.CanvasTexture(texCanvas);
     const mat = new THREE.MeshPhongMaterial({
-      map: texture,
-      specular: new THREE.Color(0x2d9e5f),
-      shininess: 15,
+      map: earthTex,
+      specular: new THREE.Color(0x1a4a2a),
+      shininess: 20,
     });
 
     const earth = new THREE.Mesh(geo, mat);
     scene.add(earth);
 
-    // Atmosphere glow
-    const atmGeo = new THREE.SphereGeometry(1.05, 64, 64);
+    // Atmosphere
     const atmMat = new THREE.MeshPhongMaterial({
-      color: 0x4ecb82,
-      transparent: true,
-      opacity: 0.08,
-      side: THREE.FrontSide,
+      color: 0x4ecb82, transparent: true, opacity: 0.07, side: THREE.FrontSide,
     });
-    scene.add(new THREE.Mesh(atmGeo, atmMat));
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.06, 32, 32), atmMat));
 
     // Lights
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.3);
     sun.position.set(3, 1, 2);
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(0x1a3a2a, 0.8));
+    scene.add(new THREE.AmbientLight(0x1a3a2a, 0.6));
 
     function animate() {
       requestAnimationFrame(animate);
