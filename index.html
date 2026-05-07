@@ -454,7 +454,7 @@
 
 <!-- LEGAL NOTICE BAR -->
 <div class="notice-bar">
-  <p data-i18n="notice_text">SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes. <a href="SilentFlora_Projektuebersicht_SAFE_DE.html" data-i18n="notice_link_de">Projektübersicht (DE)</a> · <a href="SilentFlora_ProjectOverview_SAFE_EN.html" data-i18n="notice_link_en">Project Overview (EN)</a></p>
+  <p data-i18n="notice_text">SFLR is a utility token for use within the Silent Flora game. It is not a financial instrument, not a security, and no financial return is promised or implied. Early community access is for active testers and contributors — not for investment purposes.</p>
 </div>
 
 <!-- GAME -->
@@ -503,7 +503,6 @@
   <div class="footer-text">SFLR — Polygon Mainnet — 2026</div>
   <div class="footer-links">
     <a href="https://polygonscan.com/token/0x96fBfc6da66bD5A5b4ba2f650dC6FF52d950fd8E" target="_blank">Polygonscan</a>
-    <a href="SilentFlora_ProjectOverview_SAFE_EN.html" data-i18n="footer_overview">Project Overview</a>
     <a href="https://x.com/SilentFlora_io" target="_blank">X / Twitter</a>
   </div>
 </footer>
@@ -820,39 +819,118 @@ function setLang(lang) {
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.z = 2.5;
 
-    const geo = new THREE.SphereGeometry(1, 64, 64);
-
-    // Load NASA Earth texture
+    // Load Earth texture from reliable CDN
     const loader = new THREE.TextureLoader();
     loader.crossOrigin = 'anonymous';
 
-    // Use a reliable public domain Earth texture
-    const earthTex = loader.load(
-      'https://raw.githubusercontent.com/mrdoob/three.js/r128/examples/textures/planets/earth_atmos_2048.jpg',
-      undefined, undefined,
-      function() {
-        // Fallback: procedural texture
-        const c = document.createElement('canvas');
-        c.width = 512; c.height = 256;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#0d2b4a'; ctx.fillRect(0,0,512,256);
-        ctx.fillStyle = '#2d7a3a';
-        ctx.beginPath(); ctx.ellipse(230,110,28,58,-0.2,0,Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(100,120,24,62,0.1,0,Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(370,100,62,42,0,0,Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(420,170,26,19,0,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='rgba(200,230,255,0.4)';
-        ctx.beginPath(); ctx.ellipse(256,8,120,12,0,0,Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(256,248,110,10,0,0,Math.PI*2); ctx.fill();
-        mat.map = new THREE.CanvasTexture(c);
-        mat.needsUpdate = true;
-      }
-    );
+    // Procedural Earth texture - reliable fallback
+    const texCanvas = document.createElement('canvas');
+    texCanvas.width = 1024; texCanvas.height = 512;
+    const ctx = texCanvas.getContext('2d');
+
+    // Ocean gradient
+    const oceanGrad = ctx.createLinearGradient(0, 0, 0, 512);
+    oceanGrad.addColorStop(0, '#0a1f3a');
+    oceanGrad.addColorStop(0.5, '#0d2b4a');
+    oceanGrad.addColorStop(1, '#0a1f3a');
+    ctx.fillStyle = oceanGrad;
+    ctx.fillRect(0, 0, 1024, 512);
+
+    // Land masses - more detailed
+    ctx.fillStyle = '#2d6b35';
+
+    // North America
+    ctx.beginPath();
+    ctx.moveTo(120, 80); ctx.lineTo(200, 70); ctx.lineTo(230, 100);
+    ctx.lineTo(240, 150); ctx.lineTo(220, 200); ctx.lineTo(190, 240);
+    ctx.lineTo(150, 260); ctx.lineTo(110, 250); ctx.lineTo(80, 220);
+    ctx.lineTo(70, 170); ctx.lineTo(90, 120); ctx.closePath(); ctx.fill();
+
+    // Central America
+    ctx.beginPath(); ctx.ellipse(185, 285, 15, 30, 0.3, 0, Math.PI*2); ctx.fill();
+
+    // South America
+    ctx.beginPath();
+    ctx.moveTo(200, 310); ctx.lineTo(240, 300); ctx.lineTo(260, 340);
+    ctx.lineTo(255, 400); ctx.lineTo(230, 440); ctx.lineTo(200, 450);
+    ctx.lineTo(180, 420); ctx.lineTo(175, 370); ctx.lineTo(185, 330);
+    ctx.closePath(); ctx.fill();
+
+    // Europe
+    ctx.beginPath();
+    ctx.moveTo(440, 80); ctx.lineTo(490, 75); ctx.lineTo(510, 95);
+    ctx.lineTo(505, 130); ctx.lineTo(480, 145); ctx.lineTo(450, 140);
+    ctx.lineTo(430, 120); ctx.lineTo(435, 95); ctx.closePath(); ctx.fill();
+
+    // Scandinavia
+    ctx.beginPath(); ctx.ellipse(480, 60, 18, 28, -0.2, 0, Math.PI*2); ctx.fill();
+
+    // Africa
+    ctx.beginPath();
+    ctx.moveTo(455, 160); ctx.lineTo(510, 155); ctx.lineTo(535, 185);
+    ctx.lineTo(540, 250); ctx.lineTo(520, 320); ctx.lineTo(490, 370);
+    ctx.lineTo(460, 380); ctx.lineTo(440, 350); ctx.lineTo(435, 280);
+    ctx.lineTo(440, 210); ctx.lineTo(448, 175); ctx.closePath(); ctx.fill();
+
+    // Middle East
+    ctx.beginPath(); ctx.ellipse(555, 175, 30, 22, 0, 0, Math.PI*2); ctx.fill();
+
+    // Asia - main
+    ctx.beginPath();
+    ctx.moveTo(560, 70); ctx.lineTo(700, 60); ctx.lineTo(800, 75);
+    ctx.lineTo(850, 100); ctx.lineTo(860, 150); ctx.lineTo(820, 190);
+    ctx.lineTo(750, 200); ctx.lineTo(680, 195); ctx.lineTo(610, 180);
+    ctx.lineTo(570, 155); ctx.lineTo(555, 120); ctx.lineTo(558, 85);
+    ctx.closePath(); ctx.fill();
+
+    // India
+    ctx.beginPath(); ctx.ellipse(650, 230, 28, 42, 0, 0, Math.PI*2); ctx.fill();
+
+    // Southeast Asia
+    ctx.beginPath(); ctx.ellipse(780, 235, 35, 25, 0.2, 0, Math.PI*2); ctx.fill();
+
+    // China/Korea/Japan area
+    ctx.beginPath(); ctx.ellipse(830, 155, 40, 30, 0, 0, Math.PI*2); ctx.fill();
+
+    // Australia
+    ctx.beginPath();
+    ctx.moveTo(810, 320); ctx.lineTo(870, 310); ctx.lineTo(900, 335);
+    ctx.lineTo(905, 375); ctx.lineTo(875, 400); ctx.lineTo(830, 405);
+    ctx.lineTo(800, 385); ctx.lineTo(795, 350); ctx.closePath(); ctx.fill();
+
+    // Greenland
+    ctx.fillStyle = '#3a7a42';
+    ctx.beginPath(); ctx.ellipse(290, 55, 35, 28, 0, 0, Math.PI*2); ctx.fill();
+
+    // Ice caps
+    ctx.fillStyle = 'rgba(200, 230, 255, 0.7)';
+    ctx.beginPath(); ctx.ellipse(512, 10, 200, 18, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(512, 502, 180, 15, 0, 0, Math.PI*2); ctx.fill();
+
+    // Antarctica
+    ctx.fillStyle = 'rgba(230, 240, 255, 0.5)';
+    ctx.beginPath(); ctx.ellipse(512, 490, 220, 25, 0, 0, Math.PI*2); ctx.fill();
+
+    // Cloud layer
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.beginPath(); ctx.ellipse(300, 120, 80, 20, -0.3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(650, 80, 60, 15, 0.2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(150, 300, 50, 15, 0.1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(850, 250, 55, 12, -0.1, 0, Math.PI*2); ctx.fill();
+
+    // Specular highlight (ocean shimmer)
+    const shimmer = ctx.createRadialGradient(350, 200, 0, 350, 200, 200);
+    shimmer.addColorStop(0, 'rgba(100,180,255,0.06)');
+    shimmer.addColorStop(1, 'transparent');
+    ctx.fillStyle = shimmer;
+    ctx.fillRect(0, 0, 1024, 512);
+
+    const earthTexture = new THREE.CanvasTexture(texCanvas);
 
     const mat = new THREE.MeshPhongMaterial({
-      map: earthTex,
-      specular: new THREE.Color(0x1a4a2a),
-      shininess: 20,
+      map: earthTexture,
+      specular: new THREE.Color(0x1a3a5a),
+      shininess: 25,
     });
 
     const earth = new THREE.Mesh(geo, mat);
